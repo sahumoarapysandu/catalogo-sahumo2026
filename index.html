@@ -244,6 +244,8 @@
     <h3>Confirmar pedido</h3>
     <label>Tu nombre</label>
     <input type="text" id="custName" placeholder="Ej: Ana Gómez">
+    <label>Tu teléfono</label>
+    <input type="tel" id="custPhone" placeholder="Ej: 3794123456">
     <label>¿A quién le escribís?</label>
     <select id="vendedor">
       <option value="5493794004523">Patricia · 3794-004523</option>
@@ -399,11 +401,13 @@ document.getElementById('closeModal').onclick = ()=> modalBg.classList.remove('s
 
 document.getElementById('sendBtn').onclick = ()=>{
   const name = document.getElementById('custName').value.trim() || 'Cliente';
+  const phone = document.getElementById('custPhone').value.trim();
   const vendedor = document.getElementById('vendedor').value;
   const keys = Object.keys(cart).filter(k=>cart[k].qty>0);
   if(keys.length===0) return;
 
   let total = 0;
+  const detalleItems = [];
 
   // Build WhatsApp text
   let msg = `Hola! Soy ${name} 🙋 Quiero hacer este pedido del catálogo:%0A%0A`;
@@ -413,10 +417,11 @@ document.getElementById('sendBtn').onclick = ()=>{
     const sub = p.price*entry.qty; total += sub;
     const fullName = entry.aroma ? `${p.name} (${entry.aroma})` : p.name;
     msg += `• ${fullName} x${entry.qty} - $${sub.toLocaleString('es-AR')}%0A`;
+    detalleItems.push(`${fullName} x${entry.qty}`);
   });
   msg += `%0A*Total: $${total.toLocaleString('es-AR')}*`;
 
-  // Descontar stock automático, si está configurado (no bloquea el envío por WhatsApp)
+  // Descontar stock automático y guardar el pedido, si está configurado (no bloquea el envío por WhatsApp)
   if (typeof STOCK_API_URL !== 'undefined' && STOCK_API_URL) {
     const items = keys.map(key=>{
       const entry = cart[key];
@@ -428,6 +433,19 @@ document.getElementById('sendBtn').onclick = ()=>{
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'decrement', items })
+    }).catch(()=>{ /* si falla, no interrumpe el pedido */ });
+
+    fetch(STOCK_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'pedido',
+        nombre: name,
+        telefono: phone,
+        pedido: detalleItems.join(', '),
+        total: total
+      })
     }).catch(()=>{ /* si falla, no interrumpe el pedido */ });
   }
 
