@@ -1,0 +1,139 @@
+CATALOGO SAHUMO ARAPYSANDU — GUIA RAPIDA
+=========================================
+
+QUE HAY EN ESTA CARPETA
+------------------------
+- index.html            -> la web del catalogo que ve el cliente (NO tocar)
+- productos.js           -> la lista de productos (esto lo genera el panel solo)
+- panel-productos.html   -> ABRÍ ESTE ARCHIVO para agregar/editar/borrar
+                            productos con formularios, SIN escribir código
+- images/                -> fotos viejas (ya no es obligatoria, ver mas abajo)
+
+COMO AGREGAR, EDITAR O BORRAR PRODUCTOS (sin código)
+-------------------------------------------------------
+1. Hacé doble clic en "panel-productos.html" para abrirlo en tu navegador
+   (Chrome, Safari, el que uses). Se abre como una app con todos tus
+   productos actuales ya cargados.
+
+2. Para AGREGAR uno nuevo: completá el formulario de arriba (categoría,
+   nombre, precio, foto) y tocá "Guardar producto".
+
+3. Para EDITAR uno existente: buscalo en la lista (podés usar el buscador
+   o el filtro por categoría), tocá "Editar", cambiá lo que quieras y
+   tocá "Guardar cambios".
+
+4. Para BORRAR uno: tocá "Borrar" en su tarjeta y confirmá.
+
+5. Cuando termines todos los cambios que querías hacer, tocá el botón
+   dorado grande de abajo de todo: "Descargar productos.js actualizado".
+   Se va a descargar un archivo productos.js nuevo.
+
+6. Andá a la carpeta de tu descarga y movés ese archivo nuevo DENTRO de
+   la carpeta del catálogo, reemplazando al productos.js viejo (el
+   navegador te va a preguntar si querés reemplazarlo, decís que sí).
+
+7. Subís la carpeta completa de nuevo a Cloudflare Pages o Netlify, como
+   ya hiciste antes. El link no cambia.
+
+IMPORTANTE: mientras trabajás en panel-productos.html, tus cambios se
+van guardando solos en el navegador (por si cerrás sin querer), pero
+NO se publican en tu catálogo real hasta que hagas el paso 5, 6 y 7.
+
+SOBRE EL STOCK
+--------------------------
+En el panel podés cargar un "Stock interno" (cantidad disponible) para
+cada producto. Es solo para vos: el cliente NUNCA lo ve en el catálogo.
+
+En la lista del panel vas a ver la cantidad junto a cada producto, en
+verde si hay stock normal, en naranja si quedan 3 o menos, y en rojo
+si está en 0. También hay un check "Solo bajo stock (≤3)" arriba para
+filtrar rápido y ver qué te está por faltar.
+
+Hay dos formas de manejarlo:
+
+MODO MANUAL (por defecto, sin configurar nada):
+Vos actualizás el número a mano en el panel cuando vendés o reponés.
+Si dejás el campo vacío, simplemente no se muestra nada.
+
+MODO AUTOMÁTICO (opcional, con Google Sheets):
+El stock se descuenta solo con cada pedido, y podés ver además la
+fecha de la última venta de cada producto. Configuración única:
+
+1. Andá a sheets.google.com y creá una hoja nueva. En la primera fila,
+   escribí estos 4 encabezados: id | nombre | stock | ultima_venta
+
+2. Andá al menú "Extensiones" > "Apps Script".
+
+3. Borrá todo lo que haya y pegá el código del archivo
+   "google-apps-script.txt" (viene en esta misma carpeta).
+
+4. Tocá "Implementar" > "Nueva implementación". Al lado de "Tipo",
+   tocá el engranaje y elegí "Aplicación web".
+
+5. Dejá "Ejecutar como: Yo" y "Quién tiene acceso: Cualquier usuario".
+   Tocá "Implementar" y aceptá los permisos que te pida.
+
+6. Copiá el link que te da (termina en "/exec").
+
+7. Abrí "config.js" con el Bloc de notas y pegalo entre las comillas:
+      const STOCK_API_URL = "";
+   Te tiene que quedar así:
+      const STOCK_API_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+
+8. Guardá, y subí la carpeta completa de nuevo a Cloudflare/Netlify.
+
+Una vez configurado: abrí el panel y cargá el stock inicial de cada
+producto (eso crea las filas en tu Sheet). De ahí en adelante, cada
+pedido por WhatsApp descuenta el stock solo y anota la fecha, y el
+panel siempre te muestra el número actualizado — sin que tengas que
+volver a descargar y subir productos.js para eso.
+
+Si en algún momento querés volver al modo manual, dejá
+STOCK_API_URL vacío en config.js otra vez.
+
+SOBRE EL DETALLE / DESCRIPCIÓN
+------------------------------------
+En el panel, cada producto tiene un campo "Detalle / descripción"
+donde podés escribir información extra: material, tamaño, duración,
+instrucciones de uso, lo que quieras. Es opcional.
+
+Si lo completás, en el catálogo va a aparecer un link "ⓘ Ver detalle"
+debajo del precio, que el cliente puede tocar para desplegar ese texto.
+Si lo dejás vacío, no aparece nada (como hasta ahora).
+
+SOBRE LOS AROMAS / VARIANTES
+--------------------------------
+Si un producto viene en distintos aromas (por ejemplo un sahumerio en
+Lavanda, Vainilla, Sándalo), podés cargarlos en el panel: en el campo
+"Aromas / variantes", escribís cada uno y tocás "Agregar" (o Enter).
+Se van a ver como etiquetas que podés sacar tocando la "X".
+
+Si cargás aromas, en el catálogo el cliente va a ver un selector para
+elegir cuál quiere antes de agregarlo al carrito. Si no cargás ninguno,
+el producto se agrega directo, sin selector (como hasta ahora).
+
+Todos los aromas de un mismo producto comparten el mismo precio. Si
+necesitás precios distintos por aroma, avisale a Claude para que te
+ayude a armar esa variante.
+
+SOBRE LA CARPETA "images"
+----------------------------
+Ya no es obligatoria: ahora cada foto que subís desde el panel queda
+guardada DENTRO del propio archivo productos.js (no como archivo
+aparte). Podés dejar la carpeta "images" como está o borrarla, no
+afecta al funcionamiento.
+
+SI ALGO SALE MAL
+-------------------
+Si el catálogo deja de mostrar productos después de reemplazar
+productos.js, volvé a abrir panel-productos.html (tus datos van a
+seguir ahí guardados) y descargá el archivo de nuevo.
+
+COMO PUBLICARLO / ACTUALIZARLO ONLINE
+----------------------------------------
+1. Anda a https://app.netlify.com/drop
+2. Arrastra la CARPETA COMPLETA (index.html + productos.js + images)
+3. Te da un link nuevo para compartir
+(Si ya tenias una cuenta y un sitio creado, podes simplemente volver
+a arrastrar la carpeta actualizada sobre el mismo sitio para
+reemplazarlo, sin perder el link)

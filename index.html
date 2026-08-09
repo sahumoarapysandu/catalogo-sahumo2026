@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sahumo ArapySandú · Catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-900:#152318;
+    --verde-800:#1e3626;
+    --verde-700:#2b4d36;
+    --oro:#c9a227;
+    --oro-claro:#e8cf7a;
+    --crema:#f6f0e2;
+    --crema-2:#efe6d0;
+    --tinta:#20241c;
+    --tinta-suave:#5b5646;
+    --terracota:#a85c32;
+    --line:rgba(32,36,28,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--crema);
+    color:var(--tinta);
+    font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:radial-gradient(120% 140% at 20% 0%, #24402c 0%, var(--verde-900) 60%, #0f1a11 100%);
+    color:var(--crema);
+    padding:64px 24px 48px;
+    overflow:hidden;
+    text-align:center;
+  }
+  .smoke{
+    position:absolute; inset:0; pointer-events:none; opacity:.35; mix-blend-mode:screen;
+  }
+  .smoke svg{width:100%;height:100%;}
+  .eyebrow{
+    text-transform:uppercase; letter-spacing:.28em; font-size:11px; color:var(--oro-claro);
+    font-weight:700; position:relative; z-index:2;
+  }
+  .hero h1{
+    font-size:clamp(40px,7vw,64px); margin:14px 0 6px; position:relative; z-index:2;
+  }
+  .hero .sub{
+    font-size:15px; color:#d9d2bd; position:relative; z-index:2; margin-bottom:22px;
+  }
+  .rule{
+    width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--oro),transparent);
+    margin:20px auto; position:relative; z-index:2;
+  }
+  .contacto-hero{
+    display:flex; gap:22px; justify-content:center; flex-wrap:wrap; position:relative; z-index:2;
+    font-size:13px; color:#cfc7ad;
+  }
+  .contacto-hero b{color:var(--oro-claro); font-weight:700;}
+
+  /* ---------- NAV CATEGORIAS ---------- */
+  .catnav{
+    position:sticky; top:0; z-index:40;
+    background:rgba(246,240,226,0.92); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    display:flex; gap:8px; overflow-x:auto; padding:12px 16px;
+    scrollbar-width:none;
+  }
+  .catnav::-webkit-scrollbar{display:none;}
+  .catnav button{
+    flex:0 0 auto; border:1px solid var(--line); background:transparent;
+    color:var(--tinta); padding:9px 16px; border-radius:100px; font-family:'Manrope';
+    font-size:13px; font-weight:600; cursor:pointer; transition:.2s;
+    white-space:nowrap;
+  }
+  .catnav button.active, .catnav button:hover{
+    background:var(--verde-800); color:var(--crema); border-color:var(--verde-800);
+  }
+
+  /* ---------- CATALOGO ---------- */
+  .wrap{max-width:1180px; margin:0 auto; padding:8px 20px 120px;}
+  .cat-section{padding-top:38px;}
+  .cat-title{
+    display:flex; align-items:baseline; gap:14px; margin-bottom:4px;
+  }
+  .cat-title .num{color:var(--oro); font-size:13px; font-weight:700; letter-spacing:.1em;}
+  .cat-title h2{font-size:26px; margin:0;}
+  .cat-count{color:var(--tinta-suave); font-size:13px; margin-bottom:18px;}
+
+  .grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:18px;
+  }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    display:flex; flex-direction:column; transition:transform .18s, box-shadow .18s;
+  }
+  .card:hover{transform:translateY(-3px); box-shadow:0 14px 28px -16px rgba(30,54,38,.35);}
+  .card .imgwrap{aspect-ratio:1/1; background:var(--crema-2); overflow:hidden;}
+  .card img{width:100%;height:100%;object-fit:cover; display:block;}
+  .card .info{padding:12px 14px 14px; display:flex; flex-direction:column; gap:6px; flex:1;}
+  .card .name{font-size:13.5px; font-weight:600; line-height:1.3; min-height:34px;}
+  .card .price{font-family:'Fraunces'; font-weight:700; font-size:18px; color:var(--verde-800);}
+  .card .aroma-select{
+    width:100%; padding:7px 8px; border-radius:8px; border:1px solid var(--line);
+    font-family:'Manrope'; font-size:12px; background:var(--crema); color:var(--tinta);
+  }
+  .ci-aroma{font-size:11.5px; color:var(--oro); font-weight:700; margin-top:1px;}
+  .detail-toggle{font-size:12px;}
+  .detail-toggle summary{
+    cursor:pointer; color:var(--verde-800); font-weight:700; list-style:none; user-select:none;
+  }
+  .detail-toggle summary::-webkit-details-marker{display:none;}
+  .detail-toggle summary::before{content:"ⓘ "; }
+  .detail-toggle[open] summary::before{content:"▾ ";}
+  .detail-toggle p{
+    margin:6px 0 0; color:var(--tinta-suave); font-size:12px; line-height:1.4;
+  }
+  .card .addbtn{
+    margin-top:auto; border:none; background:var(--verde-800); color:var(--crema);
+    padding:9px; border-radius:9px; font-weight:700; font-size:12.5px; cursor:pointer;
+    transition:.15s; font-family:'Manrope';
+  }
+  .card .addbtn:hover{background:var(--oro); color:var(--tinta);}
+  .card .addbtn.added{background:var(--oro);color:var(--tinta);}
+
+  /* ---------- CARRITO FLOTANTE ---------- */
+  .cart-fab{
+    position:fixed; right:20px; bottom:20px; z-index:60;
+    background:var(--verde-900); color:var(--crema); border:none;
+    width:60px; height:60px; border-radius:50%; cursor:pointer;
+    box-shadow:0 10px 24px -8px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center; font-size:24px;
+  }
+  .cart-fab .badge{
+    position:absolute; top:-4px; right:-4px; background:var(--oro); color:var(--tinta);
+    font-size:11px; font-weight:800; border-radius:50%; min-width:20px;height:20px;
+    display:flex; align-items:center; justify-content:center; padding:0 4px;
+  }
+  .cart-drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(400px,100%);
+    background:var(--crema); z-index:70; box-shadow:-20px 0 40px rgba(0,0,0,.25);
+    transform:translateX(100%); transition:transform .3s ease; display:flex; flex-direction:column;
+  }
+  .cart-drawer.open{transform:translateX(0);}
+  .cart-head{
+    background:var(--verde-900); color:var(--crema); padding:20px; display:flex;
+    justify-content:space-between; align-items:center;
+  }
+  .cart-head h3{margin:0; font-size:20px;}
+  .cart-head button{background:none;border:none;color:var(--crema);font-size:22px;cursor:pointer;}
+  .cart-items{flex:1; overflow-y:auto; padding:14px 18px;}
+  .cart-empty{color:var(--tinta-suave); text-align:center; margin-top:60px; font-size:14px;}
+  .cart-item{display:flex; gap:12px; padding:12px 0; border-bottom:1px solid var(--line);}
+  .cart-item img{width:56px;height:56px;border-radius:8px;object-fit:cover;}
+  .cart-item .ci-info{flex:1;}
+  .cart-item .ci-name{font-size:13px; font-weight:600;}
+  .cart-item .ci-price{font-size:12px; color:var(--tinta-suave); margin-top:2px;}
+  .qty{display:flex; align-items:center; gap:8px; margin-top:6px;}
+  .qty button{
+    width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:#fff;cursor:pointer;
+    font-weight:700;
+  }
+  .qty span{font-size:13px; font-weight:700; min-width:16px; text-align:center;}
+  .remove-btn{background:none;border:none;color:var(--terracota);font-size:11px;cursor:pointer;text-decoration:underline; margin-top:4px;}
+  .cart-foot{padding:18px; border-top:1px solid var(--line); background:#fff;}
+  .cart-total{display:flex; justify-content:space-between; font-family:'Fraunces'; font-size:20px; font-weight:700; margin-bottom:14px;}
+  .checkout-btn{
+    width:100%; padding:14px; border:none; border-radius:10px; background:var(--oro);
+    color:var(--tinta); font-weight:800; font-size:14.5px; cursor:pointer; font-family:'Manrope';
+  }
+  .checkout-btn:hover{background:var(--oro-claro);}
+  .checkout-btn:disabled{opacity:.4; cursor:not-allowed;}
+  .overlay{position:fixed; inset:0; background:rgba(20,24,18,.4); z-index:65; opacity:0; pointer-events:none; transition:.25s;}
+  .overlay.show{opacity:1; pointer-events:auto;}
+
+  /* ---------- MODAL CHECKOUT ---------- */
+  .modal-bg{position:fixed;inset:0;background:rgba(20,24,18,.55);z-index:80;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal-bg.show{display:flex;}
+  .modal{background:var(--crema);border-radius:16px;max-width:420px;width:100%;padding:26px;}
+  .modal h3{margin-top:0;}
+  .modal label{display:block;font-size:12.5px;font-weight:700;margin:14px 0 6px;color:var(--tinta-suave);}
+  .modal input, .modal select{
+    width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-family:'Manrope';font-size:14px;
+  }
+  .modal .close-x{position:absolute; top:14px; right:16px; background:none;border:none;font-size:20px;cursor:pointer;}
+  .modal-wrap{position:relative;}
+  .send-btn{
+    margin-top:20px;width:100%;padding:13px;border:none;border-radius:10px;background:#25D366;color:#fff;
+    font-weight:800;font-size:14.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  footer{
+    background:var(--verde-900); color:#cfc7ad; text-align:center; padding:30px 20px; font-size:12.5px;
+  }
+  footer b{color:var(--oro-claro);}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="smoke" id="smoke"></div>
+  <div class="eyebrow">Catálogo Digital · Junio 2026</div>
+  <h1>Sahumo ArapySandú</h1>
+  <div class="sub">Corrientes Capital · Sahumerios, defumación, decoración holística y más</div>
+  <div class="rule"></div>
+  <div class="contacto-hero">
+    <span><b>Patricia</b> 3794-004523</span>
+    <span><b>José Luis</b> 3794-310743</span>
+  </div>
+</div>
+
+<div class="catnav" id="catnav"></div>
+
+<div class="wrap" id="catalog"></div>
+
+<button class="cart-fab" id="cartFab" aria-label="Ver carrito">
+  🛒 <span class="badge" id="cartBadge" style="display:none">0</span>
+</button>
+
+<div class="overlay" id="overlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <h3>Tu pedido</h3>
+    <button id="closeCart">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-foot">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">$0</span></div>
+    <button class="checkout-btn" id="checkoutBtn" disabled>Finalizar pedido</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal modal-wrap">
+    <button class="close-x" id="closeModal">✕</button>
+    <h3>Confirmar pedido</h3>
+    <label>Tu nombre</label>
+    <input type="text" id="custName" placeholder="Ej: Ana Gómez">
+    <label>¿A quién le escribís?</label>
+    <select id="vendedor">
+      <option value="5493794004523">Patricia · 3794-004523</option>
+      <option value="5493794310743">José Luis · 3794-310743</option>
+    </select>
+    <button class="send-btn" id="sendBtn">💬 Enviar pedido por WhatsApp</button>
+  </div>
+</div>
+
+<footer>
+  <div><b>Sahumo ArapySandú</b> · Corrientes Capital</div>
+  <div style="margin-top:6px">Catálogo interactivo — armá tu pedido y enviálo por WhatsApp para confirmar.</div>
+</footer>
+
+<script src="config.js"></script>
+<script src="productos.js"></script>
+<script>
+const PRODUCTS = PRODUCTOS.map((p, i) => ({
+  id: p.id || (i + 1),
+  category: p.categoria,
+  name: p.nombre,
+  price: p.precio,
+  img: p.imagen,
+  aromas: Array.isArray(p.aromas) ? p.aromas : [],
+  detail: p.detalle || ''
+}));
+
+const cart = {}; // key "id::aroma" -> {id, aroma, qty}
+
+function money(n){ return '$' + n.toLocaleString('es-AR'); }
+
+// build category nav + sections
+const categories = [...new Set(PRODUCTS.map(p=>p.category))];
+const catnav = document.getElementById('catnav');
+const catalog = document.getElementById('catalog');
+
+categories.forEach((cat,i)=>{
+  const btn = document.createElement('button');
+  btn.textContent = cat;
+  btn.onclick = ()=>{ document.getElementById('sec-'+i).scrollIntoView({behavior:'smooth', block:'start'}); };
+  catnav.appendChild(btn);
+
+  const items = PRODUCTS.filter(p=>p.category===cat);
+  const section = document.createElement('div');
+  section.className='cat-section';
+  section.id='sec-'+i;
+  section.innerHTML = `
+    <div class="cat-title"><span class="num">${String(i+1).padStart(2,'0')}</span><h2>${cat}</h2></div>
+    <div class="cat-count">${items.length} productos</div>
+    <div class="grid">
+      ${items.map(p=>`
+        <div class="card">
+          <div class="imgwrap"><img src="${p.img}" loading="lazy" alt="${p.name}"></div>
+          <div class="info">
+            <div class="name">${p.name}</div>
+            <div class="price">${money(p.price)}</div>
+            ${p.detail ? `
+              <details class="detail-toggle">
+                <summary>Ver detalle</summary>
+                <p>${p.detail}</p>
+              </details>
+            ` : ''}
+            ${p.aromas.length ? `
+              <select class="aroma-select">
+                ${p.aromas.map(a=>`<option value="${a}">${a}</option>`).join('')}
+              </select>
+            ` : ''}
+            <button class="addbtn" data-id="${p.id}">Agregar</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  catalog.appendChild(section);
+});
+
+catalog.addEventListener('click', e=>{
+  if(e.target.classList.contains('addbtn')){
+    const id = e.target.dataset.id;
+    const card = e.target.closest('.card');
+    const aromaSel = card.querySelector('.aroma-select');
+    const aroma = aromaSel ? aromaSel.value : '';
+    const key = id + '::' + aroma;
+    if(!cart[key]) cart[key] = { id, aroma, qty: 0 };
+    cart[key].qty++;
+    e.target.textContent = 'Agregado ✓';
+    e.target.classList.add('added');
+    setTimeout(()=>{ e.target.textContent='Agregar'; e.target.classList.remove('added'); }, 900);
+    renderCart();
+  }
+});
+
+function renderCart(){
+  const keys = Object.keys(cart).filter(k=>cart[k].qty>0);
+  const badge = document.getElementById('cartBadge');
+  const totalQty = keys.reduce((s,k)=>s+cart[k].qty,0);
+  badge.style.display = totalQty>0 ? 'flex' : 'none';
+  badge.textContent = totalQty;
+
+  const cartItems = document.getElementById('cartItems');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  if(keys.length===0){
+    cartItems.innerHTML = '<div class="cart-empty">Todavía no agregaste productos.<br>Elegí algo del catálogo ✨</div>';
+    checkoutBtn.disabled = true;
+  } else {
+    checkoutBtn.disabled = false;
+    let total = 0;
+    cartItems.innerHTML = keys.map(key=>{
+      const entry = cart[key];
+      const p = PRODUCTS.find(x=>x.id==entry.id);
+      const sub = p.price*entry.qty;
+      total += sub;
+      return `
+        <div class="cart-item">
+          <img src="${p.img}">
+          <div class="ci-info">
+            <div class="ci-name">${p.name}</div>
+            ${entry.aroma ? `<div class="ci-aroma">Aroma: ${entry.aroma}</div>` : ''}
+            <div class="ci-price">${money(p.price)} c/u</div>
+            <div class="qty">
+              <button data-act="dec" data-key="${key}">-</button>
+              <span>${entry.qty}</span>
+              <button data-act="inc" data-key="${key}">+</button>
+            </div>
+            <button class="remove-btn" data-act="rm" data-key="${key}">Quitar</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    document.getElementById('cartTotal').textContent = money(total);
+  }
+}
+
+document.getElementById('cartItems').addEventListener('click', e=>{
+  const act = e.target.dataset.act;
+  const key = e.target.dataset.key;
+  if(!act) return;
+  if(act==='inc') cart[key].qty++;
+  if(act==='dec') { cart[key].qty--; if(cart[key].qty<=0) delete cart[key]; }
+  if(act==='rm') delete cart[key];
+  renderCart();
+});
+
+const cartDrawer = document.getElementById('cartDrawer');
+const overlay = document.getElementById('overlay');
+document.getElementById('cartFab').onclick = ()=>{ cartDrawer.classList.add('open'); overlay.classList.add('show'); };
+document.getElementById('closeCart').onclick = ()=>{ cartDrawer.classList.remove('open'); overlay.classList.remove('show'); };
+overlay.onclick = ()=>{ cartDrawer.classList.remove('open'); overlay.classList.remove('show'); document.getElementById('modalBg').classList.remove('show'); };
+
+const modalBg = document.getElementById('modalBg');
+document.getElementById('checkoutBtn').onclick = ()=> modalBg.classList.add('show');
+document.getElementById('closeModal').onclick = ()=> modalBg.classList.remove('show');
+
+document.getElementById('sendBtn').onclick = ()=>{
+  const name = document.getElementById('custName').value.trim() || 'Cliente';
+  const vendedor = document.getElementById('vendedor').value;
+  const keys = Object.keys(cart).filter(k=>cart[k].qty>0);
+  if(keys.length===0) return;
+
+  let total = 0;
+
+  // Build WhatsApp text
+  let msg = `Hola! Soy ${name} 🙋 Quiero hacer este pedido del catálogo:%0A%0A`;
+  keys.forEach(key=>{
+    const entry = cart[key];
+    const p = PRODUCTS.find(x=>x.id==entry.id);
+    const sub = p.price*entry.qty; total += sub;
+    const fullName = entry.aroma ? `${p.name} (${entry.aroma})` : p.name;
+    msg += `• ${fullName} x${entry.qty} - $${sub.toLocaleString('es-AR')}%0A`;
+  });
+  msg += `%0A*Total: $${total.toLocaleString('es-AR')}*`;
+
+  // Descontar stock automático, si está configurado (no bloquea el envío por WhatsApp)
+  if (typeof STOCK_API_URL !== 'undefined' && STOCK_API_URL) {
+    const items = keys.map(key=>{
+      const entry = cart[key];
+      const p = PRODUCTS.find(x=>x.id==entry.id);
+      return { id: p.id, cantidad: entry.qty };
+    });
+    fetch(STOCK_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'decrement', items })
+    }).catch(()=>{ /* si falla, no interrumpe el pedido */ });
+  }
+
+  window.open(`https://wa.me/${vendedor}?text=${msg}`, '_blank');
+  modalBg.classList.remove('show');
+};
+
+// ambient smoke svg
+document.getElementById('smoke').innerHTML = `
+<svg viewBox="0 0 800 400" preserveAspectRatio="none">
+  <path d="M100,400 C120,300 60,260 100,180 C140,100 90,60 120,0" stroke="#e8cf7a" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M650,400 C630,300 690,260 650,180 C610,100 660,60 630,0" stroke="#e8cf7a" stroke-width="2" fill="none" opacity="0.4"/>
+</svg>`;
+
+renderCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+CODIGO PARA GOOGLE APPS SCRIPT — STOCK AUTOMATICO
+=====================================================
+Este es el código que tenés que pegar en Google Apps Script para
+activar el descuento automático de stock, con fecha de última venta.
+
+Instrucciones completas en LEEME.txt, sección "STOCK AUTOMÁTICO".
+
+La hoja debe tener 4 columnas: id | nombre | stock | ultima_venta
+
+--------------------------------------------------------------------
+
+function doGet(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = sheet.getDataRange().getValues();
+  var rows = [];
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === "") continue;
+    rows.push({
+      id: data[i][0],
+      nombre: data[i][1],
+      stock: data[i][2],
+      ultimaVenta: data[i][3] || ""
+    });
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify(rows))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  var values = sheet.getDataRange().getValues();
+
+  function findRow(id) {
+    for (var i = 1; i < values.length; i++) {
+      if (values[i][0] === id) return i + 1;
+    }
+    return -1;
+  }
+
+  if (data.action === "set") {
+    var row = findRow(data.id);
+    if (row === -1) {
+      sheet.appendRow([data.id, data.nombre, data.stock, ""]);
+    } else {
+      sheet.getRange(row, 2).setValue(data.nombre);
+      sheet.getRange(row, 3).setValue(data.stock);
+    }
+  }
+
+  if (data.action === "decrement") {
+    var fecha = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm");
+    data.items.forEach(function(item) {
+      var row = findRow(item.id);
+      if (row === -1) {
+        sheet.appendRow([item.id, "", 0, fecha]);
+      } else {
+        var current = sheet.getRange(row, 3).getValue();
+        var nuevo = Math.max(0, current - item.cantidad);
+        sheet.getRange(row, 3).setValue(nuevo);
+        sheet.getRange(row, 4).setValue(fecha);
+      }
+    });
+  }
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: "ok" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+--------------------------------------------------------------------
