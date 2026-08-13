@@ -9,4 +9,4 @@
 // con el stock cargado a mano en el panel, sin descuento automático.
 // =====================================================================
 
-const STOCK_API_URL = "https://script.google.com/macros/s/AKfycbyp74VUIR6ED-7lndJJKviFpcPXZfxb5G1NmMr876z3Ds1sOuoE-CLWUsHfS8ip6f1r/exec";
+const STOCK_API_URL = "https://script.google.com/macros/s/AKfycbyzeXttYodnopbvAukzZlZNPncq37tzC6VWB8qNlgN1dJS6MDyQiU6aRMHveXmbUyBa/exec";
