@@ -59,13 +59,17 @@ MODO AUTOMÁTICO (opcional, con Google Sheets):
 El stock se descuenta solo con cada pedido, y podés ver además la
 fecha de la última venta de cada producto. Configuración única:
 
-1. Andá a sheets.google.com y creá una hoja nueva. En la primera fila,
-   escribí estos 4 encabezados: id | nombre | stock | ultima_venta
+1. Tu hoja de Google Sheets ya está creada:
+   https://docs.google.com/spreadsheets/d/1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow/edit
+   En la primera fila de la primera pestaña, escribí estos 4
+   encabezados: id | nombre | stock | ultima_venta
 
-2. Andá al menú "Extensiones" > "Apps Script".
+2. Abrí esa hoja y andá al menú "Extensiones" > "Apps Script".
 
 3. Borrá todo lo que haya y pegá el código del archivo
-   "google-apps-script.txt" (viene en esta misma carpeta).
+   "google-apps-script.txt" (viene en esta misma carpeta). Ese código
+   ya tiene el ID de tu hoja escrito adentro (SPREADSHEET_ID), así que
+   se conecta directo a ella sin configuración extra.
 
 4. Tocá "Implementar" > "Nueva implementación". Al lado de "Tipo",
    tocá el engranaje y elegí "Aplicación web".
@@ -122,6 +126,31 @@ Ya no es obligatoria: ahora cada foto que subís desde el panel queda
 guardada DENTRO del propio archivo productos.js (no como archivo
 aparte). Podés dejar la carpeta "images" como está o borrarla, no
 afecta al funcionamiento.
+
+NOVEDAD: PANEL PARA VENDEDORES DE FERIA
+------------------------------------------
+Se agregó panel-ventas.html — un formulario pensado para el celular,
+para que cualquier vendedor cargue una venta de feria (lugar, día,
+hora, producto, cantidad y precio) y quede guardada al instante en
+una hoja nueva de tu planilla de Google llamada "VentasFeria" (se
+crea sola la primera vez que alguien carga una venta).
+
+Para que funcione:
+1. Reemplazá el código de Google Apps Script por el nuevo (está en
+   google-apps-script.txt). Andá a Extensiones > Apps Script en tu
+   hoja, borrá todo el código viejo, pegá el nuevo, guardá.
+2. Es MUY IMPORTANTE que hagas "Implementar > Gestionar
+   implementaciones > ✏️ (editar) > Nueva versión > Implementar"
+   para que el cambio se aplique. Guardar el código solo (sin crear
+   una nueva versión) no alcanza.
+3. Compartile a cada vendedor el link de panel-ventas.html (podés
+   guardarlo como acceso directo en la pantalla de inicio del
+   celular, así lo abren como una app).
+
+Este cambio también mejora la confiabilidad del stock automático y
+el guardado de pedidos del catálogo online (index.html y
+panel-productos.html), que ahora usan un método de envío distinto,
+más estable.
 
 SI ALGO SALE MAL
 -------------------

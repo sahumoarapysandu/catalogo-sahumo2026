@@ -1,16 +1,30 @@
-CODIGO PARA GOOGLE APPS SCRIPT — STOCK AUTOMATICO
-=====================================================
-Este es el código que tenés que pegar en Google Apps Script para
-activar el descuento automático de stock, con fecha de última venta.
+CODIGO PARA GOOGLE APPS SCRIPT — STOCK, PEDIDOS Y VENTAS DE FERIA
+=========================================================================
+Este es el código que tenés que pegar en Google Apps Script. Reemplaza
+al que tenías antes: ahora recibe los datos como formulario en vez de
+JSON, que es más confiable y evita que algunos navegadores pierdan el
+pedido en el camino.
 
-Instrucciones completas en LEEME.txt, sección "STOCK AUTOMÁTICO".
+Instrucciones completas en LEEME.txt.
 
-La hoja debe tener 4 columnas: id | nombre | stock | ultima_venta
+La hoja de STOCK debe tener 4 columnas: id | nombre | stock | ultima_venta
+(esta la tenés que crear vos, como siempre)
+
+La hoja de PEDIDOS se crea SOLA la primera vez que llega un pedido
+del catálogo online, con estas columnas: fecha | nombre | telefono | pedido | total
+
+La hoja de VENTASFERIA se crea SOLA la primera vez que un vendedor
+carga una venta desde panel-ventas.html, con estas columnas:
+lugar | categoria | producto | cantidad | precio | hora | dia
 
 --------------------------------------------------------------------
 
+// ID de la hoja de Google Sheets a la que se conecta este script.
+// Sacado de: https://docs.google.com/spreadsheets/d/1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow/edit
+var SPREADSHEET_ID = "1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow";
+
 function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
   var data = sheet.getDataRange().getValues();
   var rows = [];
   for (var i = 1; i < data.length; i++) {
@@ -28,31 +42,35 @@ function doGet(e) {
 }
 
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  var values = sheet.getDataRange().getValues();
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getActiveSheet();
+  var p = e.parameter;
+  var action = p.action;
 
-  function findRow(id) {
+  function findRow(values, id) {
     for (var i = 1; i < values.length; i++) {
-      if (values[i][0] === id) return i + 1;
+      if (String(values[i][0]) === String(id)) return i + 1;
     }
     return -1;
   }
 
-  if (data.action === "set") {
-    var row = findRow(data.id);
+  if (action === "set") {
+    var values = sheet.getDataRange().getValues();
+    var row = findRow(values, p.id);
     if (row === -1) {
-      sheet.appendRow([data.id, data.nombre, data.stock, ""]);
+      sheet.appendRow([p.id, p.nombre, p.stock, ""]);
     } else {
-      sheet.getRange(row, 2).setValue(data.nombre);
-      sheet.getRange(row, 3).setValue(data.stock);
+      sheet.getRange(row, 2).setValue(p.nombre);
+      sheet.getRange(row, 3).setValue(p.stock);
     }
   }
 
-  if (data.action === "decrement") {
+  if (action === "decrement") {
+    var values = sheet.getDataRange().getValues();
+    var items = JSON.parse(p.items || "[]");
     var fecha = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm");
-    data.items.forEach(function(item) {
-      var row = findRow(item.id);
+    items.forEach(function(item) {
+      var row = findRow(values, item.id);
       if (row === -1) {
         sheet.appendRow([item.id, "", 0, fecha]);
       } else {
@@ -62,6 +80,39 @@ function doPost(e) {
         sheet.getRange(row, 4).setValue(fecha);
       }
     });
+  }
+
+  if (action === "pedido") {
+    var pedidosSheet = ss.getSheetByName("Pedidos");
+    if (!pedidosSheet) {
+      pedidosSheet = ss.insertSheet("Pedidos");
+      pedidosSheet.appendRow(["fecha", "nombre", "telefono", "pedido", "total"]);
+    }
+    var fecha = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm");
+    pedidosSheet.appendRow([
+      fecha,
+      p.nombre || "",
+      p.telefono || "",
+      p.pedido || "",
+      p.total || 0
+    ]);
+  }
+
+  if (action === "ventaferia") {
+    var ventasSheet = ss.getSheetByName("VentasFeria");
+    if (!ventasSheet) {
+      ventasSheet = ss.insertSheet("VentasFeria");
+      ventasSheet.appendRow(["lugar", "categoria", "producto", "cantidad", "precio", "hora", "dia"]);
+    }
+    ventasSheet.appendRow([
+      p.lugar || "",
+      p.categoria || "",
+      p.producto || "",
+      p.cantidad || "",
+      p.precio || "",
+      p.hora || "",
+      p.dia || ""
+    ]);
   }
 
   return ContentService

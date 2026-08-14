@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registrar venta · Sahumo ArapySandú</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-900:#152318; --verde-800:#1e3626; --oro:#c9a227; --oro-claro:#e8cf7a;
+    --crema:#f6f0e2; --crema-2:#efe6d0; --tinta:#20241c; --tinta-suave:#5b5646;
+    --terracota:#a85c32; --line:rgba(32,36,28,0.14); --ok:#3f7a4f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--crema);color:var(--tinta);font-family:'Manrope',sans-serif;}
+  h1,.display{font-family:'Fraunces',serif;font-weight:700;}
+  header{background:var(--verde-900);color:var(--crema);padding:24px 20px;text-align:center;}
+  header h1{margin:0;font-size:24px;}
+  header p{margin:6px 0 0;color:#cfc7ad;font-size:13px;}
+  .wrap{max-width:480px;margin:0 auto;padding:20px 16px 80px;}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:16px;}
+  label{display:block;font-size:12px;font-weight:700;color:var(--tinta-suave);margin-bottom:5px;margin-top:14px;}
+  label:first-child{margin-top:0;}
+  input[type=text], input[type=number], input[type=date], input[type=time], select{
+    width:100%;padding:12px;border-radius:9px;border:1px solid var(--line);
+    font-family:'Manrope';font-size:15px;background:var(--crema);
+  }
+  select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235b5646'><path d='M7 10l5 5 5-5z'/></svg>");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;}
+
+  .btn{
+    border:none;border-radius:10px;padding:14px 18px;font-weight:800;font-size:15px;
+    cursor:pointer;font-family:'Manrope';width:100%;margin-top:20px;
+  }
+  .btn-primary{background:var(--oro);color:var(--tinta);}
+  .btn-primary:hover{background:var(--oro-claro);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .aviso{
+    background:var(--crema-2);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;font-size:12.5px;color:var(--tinta-suave);margin-bottom:16px;line-height:1.5;
+  }
+
+  .toast{
+    position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--verde-900);color:var(--crema);padding:12px 20px;border-radius:10px;
+    font-size:14px;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:50;
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .historial{margin-top:6px;}
+  .historial-item{
+    display:flex;justify-content:space-between;align-items:center;
+    background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;
+  }
+  .historial-item .info b{display:block;font-size:13.5px;}
+  .historial-item .info span{color:var(--tinta-suave);font-size:11.5px;}
+  .historial-item .monto{font-family:'Fraunces';font-weight:700;color:var(--verde-800);}
+  .vacio{text-align:center;color:var(--tinta-suave);font-size:13px;padding:20px 0;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧾 Registrar venta</h1>
+  <p>Sahumo ArapySandú · Cargá cada venta de feria acá</p>
+</header>
+
+<div class="wrap">
+
+  <div class="aviso">
+    Completá los datos de la venta y tocá <b>"Guardar venta"</b>. Se manda directo a la
+    planilla de ventas — no hace falta avisarle a nadie ni mandar nada por WhatsApp.
+  </div>
+
+  <div class="panel">
+    <label for="fLugar">Lugar</label>
+    <select id="fLugar">
+      <option value="">Elegí una feria</option>
+      <option>Plaza Torrent</option>
+      <option>Laguna Seca</option>
+      <option>Parque Mitre</option>
+      <option>Paseo Arazaty</option>
+      <option>Parque Camba Cuá</option>
+    </select>
+
+    <label for="fDia">Día</label>
+    <input type="date" id="fDia">
+
+    <label for="fHora">Hora</label>
+    <input type="time" id="fHora">
+
+    <label for="fCategoria">Categoría</label>
+    <select id="fCategoria">
+      <option value="">Elegí una categoría</option>
+    </select>
+
+    <label for="fLinea">Producto / línea</label>
+    <input type="text" id="fLinea" list="lineaOptions" placeholder="Ej: Sahumerio Lavanda" autocomplete="off">
+    <datalist id="lineaOptions"></datalist>
+
+    <label for="fCantidad">Cantidad</label>
+    <input type="number" id="fCantidad" min="1" value="1" inputmode="numeric">
+
+    <label for="fPrecio">Precio ($)</label>
+    <input type="number" id="fPrecio" min="0" inputmode="numeric" placeholder="Ej: 3000">
+
+    <button class="btn btn-primary" id="saveBtn">Guardar venta</button>
+  </div>
+
+  <h2 style="font-size:15px;margin:20px 0 10px;">Cargadas en esta sesión</h2>
+  <div class="historial" id="historial">
+    <div class="vacio">Todavía no cargaste ninguna venta acá.</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="productos.js"></script>
+<script>
+const toastEl = document.getElementById('toast');
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(()=>toastEl.classList.remove('show'), 2200);
+}
+
+// Precargar día y hora actuales para no tener que escribirlos siempre
+const fDia = document.getElementById('fDia');
+const fHora = document.getElementById('fHora');
+const now = new Date();
+fDia.value = now.toISOString().slice(0,10);
+fHora.value = now.toTimeString().slice(0,5);
+
+// Cargar categorías del catálogo en el desplegable (sin repetir)
+const fCategoria = document.getElementById('fCategoria');
+const fLinea = document.getElementById('fLinea');
+const lineaOptions = document.getElementById('lineaOptions');
+const fPrecio = document.getElementById('fPrecio');
+if (typeof PRODUCTS !== 'undefined') {
+  const categorias = [...new Set(PRODUCTS.map(p=>p.categoria))];
+  categorias.forEach(cat=>{
+    const opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    fCategoria.appendChild(opt);
+  });
+}
+
+// Al elegir categoría, sugerir los productos de esa categoría en el campo de texto
+fCategoria.addEventListener('change', ()=>{
+  fLinea.value = '';
+  fPrecio.value = '';
+  lineaOptions.innerHTML = '';
+  if (!fCategoria.value || typeof PRODUCTS === 'undefined') return;
+  PRODUCTS
+    .filter(p=>p.categoria === fCategoria.value)
+    .forEach(p=>{
+      const opt = document.createElement('option');
+      opt.value = p.nombre;
+      opt.dataset.precio = p.precio;
+      lineaOptions.appendChild(opt);
+    });
+});
+
+// Si lo que escribió coincide exacto con un producto sugerido, autocompletar el precio
+fLinea.addEventListener('input', ()=>{
+  const match = [...lineaOptions.children].find(o=>o.value === fLinea.value);
+  if (match) fPrecio.value = match.dataset.precio;
+});
+
+const historialEl = document.getElementById('historial');
+let cargadas = [];
+
+function renderHistorial(){
+  if (cargadas.length === 0) {
+    historialEl.innerHTML = '<div class="vacio">Todavía no cargaste ninguna venta acá.</div>';
+    return;
+  }
+  historialEl.innerHTML = cargadas.slice().reverse().map(v=>`
+    <div class="historial-item">
+      <div class="info">
+        <b>${v.linea} x${v.cantidad}</b>
+        <span>${v.categoria} · ${v.lugar} · ${v.hora}</span>
+      </div>
+      <div class="monto">$${(v.precio*v.cantidad).toLocaleString('es-AR')}</div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  const lugar = document.getElementById('fLugar').value;
+  const dia = fDia.value;
+  const hora = fHora.value;
+  const categoria = fCategoria.value;
+  const linea = document.getElementById('fLinea').value.trim();
+  const cantidad = parseInt(document.getElementById('fCantidad').value, 10);
+  const precio = parseInt(fPrecio.value, 10);
+
+  if (!lugar) { toast('⚠️ Elegí el lugar'); return; }
+  if (!dia) { toast('⚠️ Falta el día'); return; }
+  if (!hora) { toast('⚠️ Falta la hora'); return; }
+  if (!categoria) { toast('⚠️ Elegí la categoría'); return; }
+  if (!linea) { toast('⚠️ Escribí qué producto vendiste'); return; }
+  if (!cantidad || cantidad <= 0) { toast('⚠️ Cantidad inválida'); return; }
+  if (!precio || precio <= 0) { toast('⚠️ Precio inválido'); return; }
+
+  if (typeof STOCK_API_URL === 'undefined' || !STOCK_API_URL) {
+    toast('⚠️ Todavía no está configurada la conexión con la planilla');
+    return;
+  }
+
+  sendToSheet({ action: 'ventaferia', lugar, categoria, producto: linea, cantidad, precio, hora, dia });
+
+  cargadas.push({ lugar, categoria, linea, cantidad, precio, hora, dia });
+  renderHistorial();
+  toast('✅ Venta guardada');
+
+  // Reseteamos cantidad, categoría y línea para la próxima carga, dejamos lugar/día/hora como estaban
+  document.getElementById('fCantidad').value = 1;
+  fCategoria.value = '';
+  document.getElementById('fLinea').value = '';
+  fPrecio.value = '';
+  fHora.value = new Date().toTimeString().slice(0,5);
+});
+</script>
+
+</body>
+</html>

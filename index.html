@@ -428,25 +428,15 @@ document.getElementById('sendBtn').onclick = ()=>{
       const p = PRODUCTS.find(x=>x.id==entry.id);
       return { id: p.id, cantidad: entry.qty };
     });
-    fetch(STOCK_API_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'decrement', items })
-    }).catch(()=>{ /* si falla, no interrumpe el pedido */ });
+    sendToSheet({ action: 'decrement', items: JSON.stringify(items) });
 
-    fetch(STOCK_API_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({
-        action: 'pedido',
-        nombre: name,
-        telefono: phone,
-        pedido: detalleItems.join(', '),
-        total: total
-      })
-    }).catch(()=>{ /* si falla, no interrumpe el pedido */ });
+    sendToSheet({
+      action: 'pedido',
+      nombre: name,
+      telefono: phone,
+      pedido: detalleItems.join(', '),
+      total: total
+    });
   }
 
   window.open(`https://wa.me/${vendedor}?text=${msg}`, '_blank');
