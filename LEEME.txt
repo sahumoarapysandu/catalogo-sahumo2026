@@ -62,7 +62,7 @@ fecha de la última venta de cada producto. Configuración única:
 1. Tu hoja de Google Sheets ya está creada:
    https://docs.google.com/spreadsheets/d/1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow/edit
    En la primera fila de la primera pestaña, escribí estos 6
-   encabezados: id | nombre | categoria | marca | stock | ultima_venta
+   encabezados: id | nombre | categoria | marca | aroma | stock | ultima_venta
 
 2. Abrí esa hoja y andá al menú "Extensiones" > "Apps Script".
 
@@ -128,6 +128,24 @@ el producto se agrega directo, sin selector (como hasta ahora).
 Todos los aromas de un mismo producto comparten el mismo precio. Si
 necesitás precios distintos por aroma, avisale a Claude para que te
 ayude a armar esa variante.
+
+STOCK POR AROMA
+--------------------------------
+Si un producto tiene aromas cargados, el stock se maneja por aroma en
+vez de un solo número para todo el producto: junto al nombre de cada
+aroma vas a ver un cuadrito chico donde podés poner su cantidad. El
+campo "Stock interno" de arriba se oculta automáticamente en ese caso
+(no se usa cuando el producto tiene aromas).
+
+Podés dejar el cuadrito de stock vacío en algún aroma si no querés
+controlarlo — no se muestra nada para ese aroma y no se sincroniza
+con Google Sheets.
+
+Con el modo automático de Google Sheets configurado, cada aroma con
+stock cargado se guarda como su propia fila en la hoja, con el mismo
+nombre de producto pero con su aroma en la columna "aroma" (por
+ejemplo: fila "Sahumerio Lavanda Silvestre" / aroma "Lavanda"), y se
+descuenta solo con cada pedido igual que el stock normal.
 
 SOBRE LA CARPETA "images"
 ----------------------------

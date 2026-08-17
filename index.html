@@ -310,7 +310,7 @@ categories.forEach((cat,i)=>{
             ` : ''}
             ${p.aromas.length ? `
               <select class="aroma-select">
-                ${p.aromas.map(a=>`<option value="${a}">${a}</option>`).join('')}
+                ${p.aromas.map(a=>{ const n = typeof a === 'string' ? a : a.nombre; return `<option value="${n}">${n}</option>`; }).join('')}
               </select>
             ` : ''}
             <button class="addbtn" data-id="${p.id}">Agregar</button>
@@ -426,7 +426,8 @@ document.getElementById('sendBtn').onclick = ()=>{
     const items = keys.map(key=>{
       const entry = cart[key];
       const p = PRODUCTS.find(x=>x.id==entry.id);
-      return { id: p.id, cantidad: entry.qty };
+      const itemId = entry.aroma ? `${p.id}::${entry.aroma}` : p.id;
+      return { id: itemId, cantidad: entry.qty };
     });
     sendToSheet({ action: 'decrement', items: JSON.stringify(items) });
 
