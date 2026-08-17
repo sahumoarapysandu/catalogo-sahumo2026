@@ -10,7 +10,7 @@
 // con el stock cargado a mano en el panel, sin nada automático.
 // =====================================================================
 
-const STOCK_API_URL = "https://script.google.com/macros/s/AKfycby0d8Uz6IUh3pd8frRhr2G-glvemdQU7fsXltLz6KpmjNyqzkWWNZzUKRdaiL_WAeka/exec";
+const STOCK_API_URL = "https://script.google.com/macros/s/AKfycbyp74VUIR6ED-7lndJJKviFpcPXZfxb5G1NmMr876z3Ds1sOuoE-CLWUsHfS8ip6f1r/exec";
 
 // =====================================================================
 // NO TOCAR DE ACÁ PARA ABAJO

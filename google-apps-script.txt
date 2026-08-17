@@ -7,7 +7,7 @@ pedido en el camino.
 
 Instrucciones completas en LEEME.txt.
 
-La hoja de STOCK debe tener 4 columnas: id | nombre | stock | ultima_venta
+La hoja de STOCK debe tener 6 columnas: id | nombre | categoria | marca | stock | ultima_venta
 (esta la tenés que crear vos, como siempre)
 
 La hoja de PEDIDOS se crea SOLA la primera vez que llega un pedido
@@ -32,8 +32,10 @@ function doGet(e) {
     rows.push({
       id: data[i][0],
       nombre: data[i][1],
-      stock: data[i][2],
-      ultimaVenta: data[i][3] || ""
+      categoria: data[i][2] || "",
+      marca: data[i][3] || "",
+      stock: data[i][4],
+      ultimaVenta: data[i][5] || ""
     });
   }
   return ContentService
@@ -58,10 +60,12 @@ function doPost(e) {
     var values = sheet.getDataRange().getValues();
     var row = findRow(values, p.id);
     if (row === -1) {
-      sheet.appendRow([p.id, p.nombre, p.stock, ""]);
+      sheet.appendRow([p.id, p.nombre, p.categoria || "", p.marca || "", p.stock, ""]);
     } else {
       sheet.getRange(row, 2).setValue(p.nombre);
-      sheet.getRange(row, 3).setValue(p.stock);
+      sheet.getRange(row, 3).setValue(p.categoria || "");
+      sheet.getRange(row, 4).setValue(p.marca || "");
+      sheet.getRange(row, 5).setValue(p.stock);
     }
   }
 
@@ -72,12 +76,12 @@ function doPost(e) {
     items.forEach(function(item) {
       var row = findRow(values, item.id);
       if (row === -1) {
-        sheet.appendRow([item.id, "", 0, fecha]);
+        sheet.appendRow([item.id, "", "", "", 0, fecha]);
       } else {
-        var current = sheet.getRange(row, 3).getValue();
+        var current = sheet.getRange(row, 5).getValue();
         var nuevo = Math.max(0, current - item.cantidad);
-        sheet.getRange(row, 3).setValue(nuevo);
-        sheet.getRange(row, 4).setValue(fecha);
+        sheet.getRange(row, 5).setValue(nuevo);
+        sheet.getRange(row, 6).setValue(fecha);
       }
     });
   }

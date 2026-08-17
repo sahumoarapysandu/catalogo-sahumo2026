@@ -61,8 +61,8 @@ fecha de la última venta de cada producto. Configuración única:
 
 1. Tu hoja de Google Sheets ya está creada:
    https://docs.google.com/spreadsheets/d/1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow/edit
-   En la primera fila de la primera pestaña, escribí estos 4
-   encabezados: id | nombre | stock | ultima_venta
+   En la primera fila de la primera pestaña, escribí estos 6
+   encabezados: id | nombre | categoria | marca | stock | ultima_venta
 
 2. Abrí esa hoja y andá al menú "Extensiones" > "Apps Script".
 
@@ -86,11 +86,20 @@ fecha de la última venta de cada producto. Configuración única:
 
 8. Guardá, y subí la carpeta completa de nuevo a Cloudflare/Netlify.
 
-Una vez configurado: abrí el panel y cargá el stock inicial de cada
-producto (eso crea las filas en tu Sheet). De ahí en adelante, cada
-pedido por WhatsApp descuenta el stock solo y anota la fecha, y el
-panel siempre te muestra el número actualizado — sin que tengas que
-volver a descargar y subir productos.js para eso.
+Una vez configurado: abrí el panel y guardá cada producto (con el
+botón "Guardar producto" o "Guardar cambios") — eso crea o actualiza
+su fila en tu Sheet, con nombre, categoría, marca y stock incluidos.
+De ahí en adelante, cada pedido por WhatsApp descuenta el stock solo
+y anota la fecha, y el panel siempre te muestra el número actualizado
+— sin que tengas que volver a descargar y subir productos.js para eso.
+
+SOBRE CATEGORÍA Y MARCA
+--------------------------------------------------
+Cada producto tiene una "Categoría" (se elige de una lista fija) y
+ahora también un campo "Marca" (opcional, texto libre). Ambos se
+guardan en productos.js al descargarlo, y si tenés el modo automático
+con Google Sheets configurado, también se reflejan ahí como columnas
+propias cada vez que guardás un producto.
 
 Si en algún momento querés volver al modo manual, dejá
 STOCK_API_URL vacío en config.js otra vez.
