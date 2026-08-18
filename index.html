@@ -424,7 +424,7 @@ document.getElementById('sendBtn').onclick = ()=>{
     const nameWithBrand = p.brand ? `${p.brand} - ${p.name}` : p.name;
     const fullName = entry.aroma ? `${nameWithBrand} (${entry.aroma})` : nameWithBrand;
     msg += `• ${fullName} x${entry.qty} - $${sub.toLocaleString('es-AR')}%0A`;
-    detalleItems.push(`${fullName} x${entry.qty}`);
+    detalleItems.push(`${fullName} x${entry.qty} (${money(p.price)} c/u)`);
   });
   msg += `%0A*Total: $${total.toLocaleString('es-AR')}*`;
 
