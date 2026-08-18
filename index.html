@@ -421,7 +421,8 @@ document.getElementById('sendBtn').onclick = ()=>{
     const entry = cart[key];
     const p = PRODUCTS.find(x=>x.id==entry.id);
     const sub = p.price*entry.qty; total += sub;
-    const fullName = entry.aroma ? `${p.name} (${entry.aroma})` : p.name;
+    const nameWithBrand = p.brand ? `${p.brand} - ${p.name}` : p.name;
+    const fullName = entry.aroma ? `${nameWithBrand} (${entry.aroma})` : nameWithBrand;
     msg += `• ${fullName} x${entry.qty} - $${sub.toLocaleString('es-AR')}%0A`;
     detalleItems.push(`${fullName} x${entry.qty}`);
   });
