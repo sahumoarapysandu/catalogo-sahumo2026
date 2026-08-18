@@ -100,6 +100,15 @@
     <input type="text" id="fLinea" list="lineaOptions" placeholder="Ej: Sahumerio Lavanda" autocomplete="off">
     <datalist id="lineaOptions"></datalist>
 
+    <label for="fMarca">Marca</label>
+    <input type="text" id="fMarca" list="marcaOptions" placeholder="Se completa automático (o escribila)" autocomplete="off">
+    <datalist id="marcaOptions"></datalist>
+
+    <label for="fAroma">Aroma</label>
+    <select id="fAroma">
+      <option value="">Sin aroma / no aplica</option>
+    </select>
+
     <label for="fCantidad">Cantidad</label>
     <input type="number" id="fCantidad" min="1" value="1" inputmode="numeric">
 
@@ -140,8 +149,25 @@ const fCategoria = document.getElementById('fCategoria');
 const fLinea = document.getElementById('fLinea');
 const lineaOptions = document.getElementById('lineaOptions');
 const fPrecio = document.getElementById('fPrecio');
-if (typeof PRODUCTS !== 'undefined') {
-  const categorias = [...new Set(PRODUCTS.map(p=>p.categoria))];
+const fMarca = document.getElementById('fMarca');
+const marcaOptions = document.getElementById('marcaOptions');
+const fAroma = document.getElementById('fAroma');
+
+// Guarda los productos de la categoría elegida, para poder buscar marca/aroma
+let productosCategoria = [];
+
+// Devuelve la lista de nombres de aroma de un producto, sea cual sea el formato
+// que tenga en productos.js (array de strings o array de objetos {nombre, stock})
+function nombresAroma(producto){
+  if (!producto || !Array.isArray(producto.aromas)) return [];
+  return producto.aromas.map(a => (typeof a === 'string') ? a : a.nombre).filter(Boolean);
+}
+
+function resetAroma(){
+  fAroma.innerHTML = '<option value="">Sin aroma / no aplica</option>';
+}
+if (typeof PRODUCTOS !== 'undefined') {
+  const categorias = [...new Set(PRODUCTOS.map(p=>p.categoria))];
   categorias.forEach(cat=>{
     const opt = document.createElement('option');
     opt.value = cat;
@@ -150,26 +176,55 @@ if (typeof PRODUCTS !== 'undefined') {
   });
 }
 
-// Al elegir categoría, sugerir los productos de esa categoría en el campo de texto
+// Al elegir categoría, sugerir los productos (y sus marcas) de esa categoría
 fCategoria.addEventListener('change', ()=>{
   fLinea.value = '';
+  fMarca.value = '';
   fPrecio.value = '';
   lineaOptions.innerHTML = '';
-  if (!fCategoria.value || typeof PRODUCTS === 'undefined') return;
-  PRODUCTS
-    .filter(p=>p.categoria === fCategoria.value)
-    .forEach(p=>{
-      const opt = document.createElement('option');
-      opt.value = p.nombre;
-      opt.dataset.precio = p.precio;
-      lineaOptions.appendChild(opt);
-    });
+  marcaOptions.innerHTML = '';
+  resetAroma();
+  productosCategoria = [];
+  if (!fCategoria.value || typeof PRODUCTOS === 'undefined') return;
+
+  productosCategoria = PRODUCTOS.filter(p=>p.categoria === fCategoria.value);
+
+  productosCategoria.forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p.nombre;
+    opt.dataset.precio = p.precio;
+    opt.dataset.marca = p.marca || '';
+    lineaOptions.appendChild(opt);
+  });
+
+  // Sugerencias de marca (sin repetir), por si quiere escribirla a mano
+  [...new Set(productosCategoria.map(p=>p.marca).filter(Boolean))].forEach(marca=>{
+    const opt = document.createElement('option');
+    opt.value = marca;
+    marcaOptions.appendChild(opt);
+  });
 });
 
-// Si lo que escribió coincide exacto con un producto sugerido, autocompletar el precio
+// Si lo que escribió coincide exacto con un producto sugerido, autocompletar precio, marca y aromas
 fLinea.addEventListener('input', ()=>{
-  const match = [...lineaOptions.children].find(o=>o.value === fLinea.value);
-  if (match) fPrecio.value = match.dataset.precio;
+  const producto = productosCategoria.find(p=>p.nombre === fLinea.value);
+
+  if (!producto) {
+    resetAroma();
+    return;
+  }
+
+  fPrecio.value = producto.precio;
+  if (producto.marca) fMarca.value = producto.marca;
+
+  const aromas = nombresAroma(producto);
+  resetAroma();
+  aromas.forEach(nombreAroma=>{
+    const opt = document.createElement('option');
+    opt.value = nombreAroma;
+    opt.textContent = nombreAroma;
+    fAroma.appendChild(opt);
+  });
 });
 
 const historialEl = document.getElementById('historial');
@@ -180,15 +235,18 @@ function renderHistorial(){
     historialEl.innerHTML = '<div class="vacio">Todavía no cargaste ninguna venta acá.</div>';
     return;
   }
-  historialEl.innerHTML = cargadas.slice().reverse().map(v=>`
+  historialEl.innerHTML = cargadas.slice().reverse().map(v=>{
+    const detalle = [v.categoria, v.marca, v.aroma, v.lugar, v.hora].filter(Boolean).join(' · ');
+    return `
     <div class="historial-item">
       <div class="info">
         <b>${v.linea} x${v.cantidad}</b>
-        <span>${v.categoria} · ${v.lugar} · ${v.hora}</span>
+        <span>${detalle}</span>
       </div>
       <div class="monto">$${(v.precio*v.cantidad).toLocaleString('es-AR')}</div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 document.getElementById('saveBtn').addEventListener('click', ()=>{
@@ -197,6 +255,8 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   const hora = fHora.value;
   const categoria = fCategoria.value;
   const linea = document.getElementById('fLinea').value.trim();
+  const marca = fMarca.value.trim();
+  const aroma = fAroma.value;
   const cantidad = parseInt(document.getElementById('fCantidad').value, 10);
   const precio = parseInt(fPrecio.value, 10);
 
@@ -213,16 +273,19 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
     return;
   }
 
-  sendToSheet({ action: 'ventaferia', lugar, categoria, producto: linea, cantidad, precio, hora, dia });
+  sendToSheet({ action: 'ventaferia', lugar, categoria, producto: linea, marca, aroma, cantidad, precio, hora, dia });
 
-  cargadas.push({ lugar, categoria, linea, cantidad, precio, hora, dia });
+  cargadas.push({ lugar, categoria, linea, marca, aroma, cantidad, precio, hora, dia });
   renderHistorial();
   toast('✅ Venta guardada');
 
-  // Reseteamos cantidad, categoría y línea para la próxima carga, dejamos lugar/día/hora como estaban
+  // Reseteamos cantidad, categoría, línea, marca y aroma para la próxima carga, dejamos lugar/día/hora como estaban
   document.getElementById('fCantidad').value = 1;
   fCategoria.value = '';
   document.getElementById('fLinea').value = '';
+  fMarca.value = '';
+  resetAroma();
+  productosCategoria = [];
   fPrecio.value = '';
   fHora.value = new Date().toTimeString().slice(0,5);
 });
