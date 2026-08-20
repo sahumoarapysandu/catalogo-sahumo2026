@@ -72,10 +72,8 @@
     position:sticky; top:0; z-index:40;
     background:rgba(246,240,226,0.92); backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
-    display:flex; gap:8px; overflow-x:auto; padding:12px 16px;
-    scrollbar-width:none;
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:12px 16px;
   }
-  .catnav::-webkit-scrollbar{display:none;}
   .catnav button{
     flex:0 0 auto; border:1px solid var(--line); background:transparent;
     color:var(--tinta); padding:9px 16px; border-radius:100px; font-family:'Manrope';
@@ -84,6 +82,10 @@
   }
   .catnav button.active, .catnav button:hover{
     background:var(--verde-800); color:var(--crema); border-color:var(--verde-800);
+  }
+  @media (max-width:480px){
+    .catnav{ gap:6px; padding:10px 12px; }
+    .catnav button{ padding:7px 11px; font-size:11.5px; }
   }
 
   /* ---------- CATALOGO ---------- */
@@ -287,16 +289,36 @@ const categories = [...new Set(PRODUCTS.map(p=>p.category))];
 const catnav = document.getElementById('catnav');
 const catalog = document.getElementById('catalog');
 
+// Botón "Todos" para volver a ver el catálogo completo
+const allBtn = document.createElement('button');
+allBtn.textContent = 'Todos';
+allBtn.classList.add('active');
+allBtn.onclick = ()=>{ setActiveCategory(null); };
+catnav.appendChild(allBtn);
+
+function setActiveCategory(cat){
+  // Marca el botón activo
+  [...catnav.children].forEach(b=>{
+    b.classList.toggle('active', b.textContent === (cat || 'Todos'));
+  });
+  // Muestra solo la sección elegida (o todas si cat es null)
+  [...catalog.children].forEach(section=>{
+    section.style.display = (!cat || section.dataset.category === cat) ? '' : 'none';
+  });
+  window.scrollTo({ top: catalog.offsetTop - 80, behavior: 'smooth' });
+}
+
 categories.forEach((cat,i)=>{
   const btn = document.createElement('button');
   btn.textContent = cat;
-  btn.onclick = ()=>{ document.getElementById('sec-'+i).scrollIntoView({behavior:'smooth', block:'start'}); };
+  btn.onclick = ()=>{ setActiveCategory(cat); };
   catnav.appendChild(btn);
 
   const items = PRODUCTS.filter(p=>p.category===cat);
   const section = document.createElement('div');
   section.className='cat-section';
   section.id='sec-'+i;
+  section.dataset.category = cat;
   section.innerHTML = `
     <div class="cat-title"><span class="num">${String(i+1).padStart(2,'0')}</span><h2>${cat}</h2></div>
     <div class="cat-count">${items.length} productos</div>
