@@ -115,6 +115,13 @@
     <label for="fPrecio">Precio ($)</label>
     <input type="number" id="fPrecio" min="0" inputmode="numeric" placeholder="Ej: 3000">
 
+    <label for="fPago">Forma de pago</label>
+    <select id="fPago">
+      <option value="">Elegí cómo pagó</option>
+      <option>Efectivo</option>
+      <option>Mercado Pago</option>
+    </select>
+
     <button class="btn btn-primary" id="saveBtn">Guardar venta</button>
   </div>
 
@@ -236,7 +243,7 @@ function renderHistorial(){
     return;
   }
   historialEl.innerHTML = cargadas.slice().reverse().map(v=>{
-    const detalle = [v.categoria, v.marca, v.aroma, v.lugar, v.hora].filter(Boolean).join(' · ');
+    const detalle = [v.categoria, v.marca, v.aroma, v.lugar, v.pago, v.hora].filter(Boolean).join(' · ');
     return `
     <div class="historial-item">
       <div class="info">
@@ -259,6 +266,7 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   const aroma = fAroma.value;
   const cantidad = parseInt(document.getElementById('fCantidad').value, 10);
   const precio = parseInt(fPrecio.value, 10);
+  const pago = document.getElementById('fPago').value;
 
   if (!lugar) { toast('⚠️ Elegí el lugar'); return; }
   if (!dia) { toast('⚠️ Falta el día'); return; }
@@ -267,19 +275,20 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   if (!linea) { toast('⚠️ Escribí qué producto vendiste'); return; }
   if (!cantidad || cantidad <= 0) { toast('⚠️ Cantidad inválida'); return; }
   if (!precio || precio <= 0) { toast('⚠️ Precio inválido'); return; }
+  if (!pago) { toast('⚠️ Elegí la forma de pago'); return; }
 
   if (typeof STOCK_API_URL === 'undefined' || !STOCK_API_URL) {
     toast('⚠️ Todavía no está configurada la conexión con la planilla');
     return;
   }
 
-  sendToSheet({ action: 'ventaferia', lugar, categoria, producto: linea, marca, aroma, cantidad, precio, hora, dia });
+  sendToSheet({ action: 'ventaferia', lugar, categoria, producto: linea, marca, aroma, cantidad, precio, pago, hora, dia });
 
-  cargadas.push({ lugar, categoria, linea, marca, aroma, cantidad, precio, hora, dia });
+  cargadas.push({ lugar, categoria, linea, marca, aroma, cantidad, precio, pago, hora, dia });
   renderHistorial();
   toast('✅ Venta guardada');
 
-  // Reseteamos cantidad, categoría, línea, marca y aroma para la próxima carga, dejamos lugar/día/hora como estaban
+  // Reseteamos cantidad, categoría, línea, marca, aroma y forma de pago para la próxima carga, dejamos lugar/día/hora como estaban
   document.getElementById('fCantidad').value = 1;
   fCategoria.value = '';
   document.getElementById('fLinea').value = '';
@@ -287,6 +296,7 @@ document.getElementById('saveBtn').addEventListener('click', ()=>{
   resetAroma();
   productosCategoria = [];
   fPrecio.value = '';
+  document.getElementById('fPago').value = '';
   fHora.value = new Date().toTimeString().slice(0,5);
 });
 </script>
