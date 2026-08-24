@@ -88,6 +88,41 @@
     .catnav button{ padding:7px 11px; font-size:11.5px; }
   }
 
+  /* ---------- BUSCADOR ---------- */
+  .searchbar{
+    max-width:640px; margin:18px auto 0; padding:0 20px;
+    display:flex; flex-direction:column; gap:10px; align-items:center;
+  }
+  .search-field{position:relative; width:100%;}
+  .search-field input{
+    padding:13px 16px; border-radius:11px; border:1px solid var(--line);
+    font-family:'Manrope'; font-size:14.5px; background:#fff; color:var(--tinta); width:100%;
+  }
+  .search-field input:focus{outline:none; border-color:var(--oro);}
+  .suggestions{
+    position:absolute; top:100%; left:0; right:0; margin-top:4px;
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    box-shadow:0 14px 28px -16px rgba(30,54,38,.35); max-height:280px; overflow-y:auto;
+    z-index:50; display:none;
+  }
+  .suggestions.show{display:block;}
+  .suggestions div{
+    padding:10px 14px; font-size:13.5px; cursor:pointer; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .suggestions div:last-child{border-bottom:none;}
+  .suggestions div:hover{background:var(--crema-2);}
+  .suggestions .no-match{color:var(--tinta-suave); cursor:default; justify-content:center;}
+  .suggestions .tag{
+    font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:800;
+    color:var(--oro); background:var(--crema-2); padding:2px 8px; border-radius:100px; flex:0 0 auto;
+  }
+  .clear-btn{
+    margin-top:0; border:1px solid var(--line); background:transparent; color:var(--terracota);
+    padding:7px 16px; border-radius:100px; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .clear-btn:hover{background:var(--terracota); color:#fff; border-color:var(--terracota);}
+
   /* ---------- CATALOGO ---------- */
   .wrap{max-width:1180px; margin:0 auto; padding:8px 20px 120px;}
   .cat-section{padding-top:38px;}
@@ -225,6 +260,14 @@
 
 <div class="catnav" id="catnav"></div>
 
+<div class="searchbar" id="searchbar">
+  <div class="search-field" data-field="all">
+    <input type="text" id="searchAll" placeholder="Buscar por marca, nombre o aroma..." autocomplete="off">
+    <div class="suggestions" id="suggAll"></div>
+  </div>
+  <button class="clear-btn" id="clearFilters" style="display:none">✕ Limpiar búsqueda</button>
+</div>
+
 <div class="wrap" id="catalog"></div>
 
 <button class="cart-fab" id="cartFab" aria-label="Ver carrito">
@@ -274,6 +317,7 @@ const PRODUCTS = PRODUCTOS.map((p, i) => ({
   category: p.categoria,
   name: p.nombre,
   brand: p.marca || '',
+  linea: p.linea || '',
   price: p.precio,
   img: p.imagen,
   aromas: Array.isArray(p.aromas) ? p.aromas : [],
@@ -281,8 +325,12 @@ const PRODUCTS = PRODUCTOS.map((p, i) => ({
 }));
 
 const cart = {}; // key "id::aroma" -> {id, aroma, qty}
+let currentCategory = null;
 
 function money(n){ return '$' + n.toLocaleString('es-AR'); }
+function normalize(str){
+  return (str||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
 
 // build category nav + sections
 const categories = [...new Set(PRODUCTS.map(p=>p.category))];
@@ -296,7 +344,7 @@ allBtn.classList.add('active');
 allBtn.onclick = ()=>{ setActiveCategory(null); };
 catnav.appendChild(allBtn);
 
-function setActiveCategory(cat){
+function showCategory(cat){
   // Marca el botón activo
   [...catnav.children].forEach(b=>{
     b.classList.toggle('active', b.textContent === (cat || 'Todos'));
@@ -305,6 +353,11 @@ function setActiveCategory(cat){
   [...catalog.children].forEach(section=>{
     section.style.display = (!cat || section.dataset.category === cat) ? '' : 'none';
   });
+}
+
+function setActiveCategory(cat){
+  currentCategory = cat;
+  showCategory(cat);
   window.scrollTo({ top: catalog.offsetTop - 80, behavior: 'smooth' });
 }
 
@@ -324,7 +377,7 @@ categories.forEach((cat,i)=>{
     <div class="cat-count">${items.length} productos</div>
     <div class="grid">
       ${items.map(p=>`
-        <div class="card">
+        <div class="card" data-search="${normalize([p.brand, p.name, ...(p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre)].join(' | '))}">
           <div class="imgwrap"><img src="${p.img}" loading="lazy" alt="${p.name}"></div>
           <div class="info">
             ${p.brand ? `<div class="marca">${p.brand}</div>` : ''}
@@ -348,6 +401,105 @@ categories.forEach((cat,i)=>{
     </div>
   `;
   catalog.appendChild(section);
+});
+
+// ---------- BUSCADOR (marca / línea / aroma en un solo campo) ----------
+const searchIndex = [
+  ...allBrandsList(),
+  ...allNamesList(),
+  ...allAromasList()
+];
+function allBrandsList(){
+  return [...new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))].map(v=>({label:v, tag:'Marca'}));
+}
+function allNamesList(){
+  return [...new Set(PRODUCTS.map(p=>p.name).filter(Boolean))].map(v=>({label:v, tag:'Nombre'}));
+}
+function allAromasList(){
+  return [...new Set(PRODUCTS.flatMap(p=>(p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre)))]
+    .filter(Boolean).map(v=>({label:v, tag:'Aroma'}));
+}
+searchIndex.sort((a,b)=>a.label.localeCompare(b.label,'es'));
+
+let searchQuery = '';
+
+function cardMatches(card){
+  const q = normalize(searchQuery);
+  return !q || card.dataset.search.includes(q);
+}
+
+function applyFilters(){
+  const active = !!searchQuery.trim();
+  document.getElementById('clearFilters').style.display = active ? 'inline-block' : 'none';
+
+  if(active){
+    // Con búsqueda activa se ignora la categoría elegida y se buscan coincidencias en todo el catálogo
+    [...catnav.children].forEach(b=>b.classList.remove('active'));
+    [...catalog.children].forEach(section=>{
+      let visible = 0;
+      section.querySelectorAll('.card').forEach(card=>{
+        const match = cardMatches(card);
+        card.style.display = match ? '' : 'none';
+        if(match) visible++;
+      });
+      section.style.display = visible>0 ? '' : 'none';
+      const countEl = section.querySelector('.cat-count');
+      if(countEl) countEl.textContent = visible + (visible===1 ? ' producto' : ' productos');
+    });
+  } else {
+    // Sin búsqueda: se restaura el conteo original y la vista por categoría
+    [...catalog.children].forEach(section=>{
+      section.querySelectorAll('.card').forEach(card=>{ card.style.display = ''; });
+      const countEl = section.querySelector('.cat-count');
+      const total = section.querySelectorAll('.card').length;
+      if(countEl) countEl.textContent = total + (total===1 ? ' producto' : ' productos');
+    });
+    showCategory(currentCategory);
+  }
+}
+
+const searchInput = document.getElementById('searchAll');
+const searchSugg = document.getElementById('suggAll');
+
+function renderSuggestions(){
+  const val = normalize(searchInput.value);
+  if(!val){ searchSugg.classList.remove('show'); searchSugg.innerHTML=''; return; }
+  const matches = searchIndex.filter(item=>normalize(item.label).includes(val)).slice(0,10);
+  searchSugg.innerHTML = matches.length
+    ? matches.map(item=>`<div data-val="${item.label}"><span>${item.label}</span><span class="tag">${item.tag}</span></div>`).join('')
+    : '<div class="no-match">Sin resultados</div>';
+  searchSugg.classList.add('show');
+}
+
+// A medida que se escribe: se van rellenando/filtrando tanto las sugerencias como el catálogo
+searchInput.addEventListener('input', ()=>{
+  searchQuery = searchInput.value;
+  renderSuggestions();
+  applyFilters();
+});
+searchInput.addEventListener('focus', renderSuggestions);
+
+searchSugg.addEventListener('click', e=>{
+  const val = e.target.closest('[data-val]')?.dataset.val;
+  if(!val) return;
+  searchInput.value = val;
+  searchQuery = val;
+  searchSugg.classList.remove('show');
+  applyFilters();
+});
+
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.search-field[data-field="all"]')){
+    searchSugg.classList.remove('show');
+  }
+});
+
+document.getElementById('clearFilters').addEventListener('click', ()=>{
+  searchQuery = '';
+  searchInput.value = '';
+  searchSugg.classList.remove('show');
+  searchSugg.innerHTML = '';
+  applyFilters();
 });
 
 catalog.addEventListener('click', e=>{
