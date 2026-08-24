@@ -461,19 +461,27 @@ categories.forEach((cat,i)=>{
 });
 
 // ---------- BUSCADOR (marca / línea / aroma en un solo campo) ----------
+function dedupeCaseInsensitive(arr){
+  const map = new Map(); // clave normalizada -> primer texto visto (con su capitalización original)
+  arr.forEach(v=>{
+    const key = normalize(v);
+    if(key && !map.has(key)) map.set(key, v);
+  });
+  return [...map.values()];
+}
 const searchIndex = [
   ...allBrandsList(),
   ...allNamesList(),
   ...allAromasList()
 ];
 function allBrandsList(){
-  return [...new Set(PRODUCTS.map(p=>p.brand).filter(Boolean))].map(v=>({label:v, tag:'Marca'}));
+  return dedupeCaseInsensitive(PRODUCTS.map(p=>p.brand).filter(Boolean)).map(v=>({label:v, tag:'Marca'}));
 }
 function allNamesList(){
-  return [...new Set(PRODUCTS.map(p=>p.name).filter(Boolean))].map(v=>({label:v, tag:'Nombre'}));
+  return dedupeCaseInsensitive(PRODUCTS.map(p=>p.name).filter(Boolean)).map(v=>({label:v, tag:'Nombre'}));
 }
 function allAromasList(){
-  return [...new Set(PRODUCTS.flatMap(p=>(p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre)))]
+  return dedupeCaseInsensitive(PRODUCTS.flatMap(p=>(p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre)))
     .filter(Boolean).map(v=>({label:v, tag:'Aroma'}));
 }
 searchIndex.sort((a,b)=>a.label.localeCompare(b.label,'es'));
