@@ -233,6 +233,57 @@
     width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-family:'Manrope';font-size:14px;
   }
   .modal .close-x{position:absolute; top:14px; right:16px; background:none;border:none;font-size:20px;cursor:pointer;}
+
+  /* ---------- MODAL DETALLE DE PRODUCTO ---------- */
+  .detail-btn{
+    background:none; border:none; padding:0; margin-top:-2px;
+    color:var(--verde-800); font-weight:700; font-size:12px; cursor:pointer;
+    text-align:left; display:flex; align-items:center; gap:4px; font-family:'Manrope';
+  }
+  .detail-btn:hover{color:var(--oro);}
+  .detail-btn::before{content:"ⓘ"; font-size:12px;}
+  .detail-modal{
+    background:var(--crema); border-radius:18px; max-width:600px; width:100%;
+    max-height:88vh; overflow-y:auto; position:relative;
+  }
+  .detail-modal .close-x{
+    position:absolute; top:14px; right:14px; z-index:2;
+    background:rgba(21,35,24,.55); color:#fff; width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:17px; border:none; cursor:pointer;
+  }
+  .detail-modal .close-x:hover{background:var(--verde-900);}
+  .detail-img{
+    width:100%; aspect-ratio:4/3; background:var(--crema-2); overflow:hidden;
+    border-radius:18px 18px 0 0;
+  }
+  .detail-img img{width:100%; height:100%; object-fit:cover; display:block;}
+  .detail-body{padding:22px 24px 26px;}
+  .detail-body .marca{
+    text-transform:uppercase; letter-spacing:.1em; font-size:11.5px; font-weight:800; color:var(--oro);
+  }
+  .detail-body h3{margin:6px 0 4px; font-size:22px; line-height:1.25;}
+  .detail-body .price{
+    font-family:'Fraunces'; font-weight:700; font-size:21px; color:var(--verde-800); margin-bottom:14px;
+  }
+  .detail-body .desc{
+    color:var(--tinta-suave); font-size:14px; line-height:1.65; padding-top:14px;
+    border-top:1px solid var(--line);
+  }
+  .detail-aromas{display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 2px;}
+  .detail-aromas span{
+    background:var(--crema-2); color:var(--tinta); font-size:11.5px; font-weight:700;
+    padding:5px 12px; border-radius:100px;
+  }
+  .detail-body .addbtn{
+    margin-top:20px; width:100%; border:none; background:var(--verde-800); color:var(--crema);
+    padding:13px; border-radius:10px; font-weight:700; font-size:14px; cursor:pointer;
+    transition:.15s; font-family:'Manrope';
+  }
+  .detail-body .addbtn:hover{background:var(--oro); color:var(--tinta);}
+  @media (max-width:520px){
+    .detail-modal{max-height:92vh;}
+    .detail-body{padding:18px 18px 22px;}
+  }
   .modal-wrap{position:relative;}
   .send-btn{
     margin-top:20px;width:100%;padding:13px;border:none;border-radius:10px;background:#25D366;color:#fff;
@@ -302,6 +353,10 @@
     </select>
     <button class="send-btn" id="sendBtn">💬 Enviar pedido por WhatsApp</button>
   </div>
+</div>
+
+<div class="modal-bg" id="detailModalBg">
+  <div class="detail-modal" id="detailModal"></div>
 </div>
 
 <footer>
@@ -384,10 +439,7 @@ categories.forEach((cat,i)=>{
             <div class="name">${p.name}</div>
             <div class="price">${money(p.price)}</div>
             ${p.detail ? `
-              <details class="detail-toggle">
-                <summary>Ver detalle</summary>
-                <p>${p.detail}</p>
-              </details>
+              <button class="detail-btn" data-detail-id="${p.id}">Ver detalle</button>
             ` : ''}
             ${p.aromas.length ? `
               <select class="aroma-select">
@@ -502,19 +554,66 @@ document.getElementById('clearFilters').addEventListener('click', ()=>{
   applyFilters();
 });
 
+function addToCart(id, aroma){
+  const key = id + '::' + aroma;
+  if(!cart[key]) cart[key] = { id, aroma, qty: 0 };
+  cart[key].qty++;
+  renderCart();
+}
+
+function openDetailModal(id){
+  const p = PRODUCTS.find(x=>x.id==id);
+  if(!p) return;
+  const aromaNames = (p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre);
+  const modal = document.getElementById('detailModal');
+  modal.innerHTML = `
+    <button class="close-x" id="closeDetailModal">✕</button>
+    <div class="detail-img"><img src="${p.img}" alt="${p.name}"></div>
+    <div class="detail-body">
+      ${p.brand ? `<div class="marca">${p.brand}</div>` : ''}
+      <h3>${p.name}</h3>
+      <div class="price">${money(p.price)}</div>
+      ${aromaNames.length ? `
+        <select class="aroma-select" id="detailAromaSelect">
+          ${aromaNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
+        </select>
+      ` : ''}
+      ${p.detail ? `<p class="desc">${p.detail}</p>` : ''}
+      <button class="addbtn" id="detailAddBtn">Agregar al pedido</button>
+    </div>
+  `;
+  document.getElementById('detailModalBg').classList.add('show');
+  document.getElementById('closeDetailModal').onclick = closeDetailModal;
+  document.getElementById('detailAddBtn').onclick = e=>{
+    const aromaSel = document.getElementById('detailAromaSelect');
+    const aroma = aromaSel ? aromaSel.value : '';
+    addToCart(p.id, aroma);
+    e.target.textContent = 'Agregado ✓';
+    e.target.classList.add('added');
+    setTimeout(()=>{ e.target.textContent = 'Agregar al pedido'; e.target.classList.remove('added'); }, 900);
+  };
+}
+function closeDetailModal(){
+  document.getElementById('detailModalBg').classList.remove('show');
+}
+document.getElementById('detailModalBg').addEventListener('click', e=>{
+  if(e.target.id === 'detailModalBg') closeDetailModal();
+});
+
 catalog.addEventListener('click', e=>{
+  if(e.target.classList.contains('detail-btn')){
+    openDetailModal(e.target.dataset.detailId);
+    return;
+  }
   if(e.target.classList.contains('addbtn')){
     const id = e.target.dataset.id;
     const card = e.target.closest('.card');
     const aromaSel = card.querySelector('.aroma-select');
     const aroma = aromaSel ? aromaSel.value : '';
-    const key = id + '::' + aroma;
-    if(!cart[key]) cart[key] = { id, aroma, qty: 0 };
-    cart[key].qty++;
+    addToCart(id, aroma);
     e.target.textContent = 'Agregado ✓';
     e.target.classList.add('added');
     setTimeout(()=>{ e.target.textContent='Agregar'; e.target.classList.remove('added'); }, 900);
-    renderCart();
   }
 });
 
