@@ -269,6 +269,7 @@
     color:var(--tinta-suave); font-size:14px; line-height:1.65; padding-top:14px;
     border-top:1px solid var(--line);
   }
+  .detail-body .desc br{content:""; display:block; margin-top:8px;}
   .detail-aromas{display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 2px;}
   .detail-aromas span{
     background:var(--crema-2); color:var(--tinta); font-size:11.5px; font-weight:700;
@@ -385,6 +386,10 @@ let currentCategory = null;
 function money(n){ return '$' + n.toLocaleString('es-AR'); }
 function normalize(str){
   return (str||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+function formatDetail(text){
+  // Cada "punto seguido" (punto + espacio) pasa a la línea de abajo
+  return (text || '').trim().replace(/\.\s+/g, '.<br>');
 }
 
 // build category nav + sections
@@ -578,7 +583,7 @@ function openDetailModal(id){
           ${aromaNames.map(n=>`<option value="${n}">${n}</option>`).join('')}
         </select>
       ` : ''}
-      ${p.detail ? `<p class="desc">${p.detail}</p>` : ''}
+      ${p.detail ? `<p class="desc">${formatDetail(p.detail)}</p>` : ''}
       <button class="addbtn" id="detailAddBtn">Agregar al pedido</button>
     </div>
   `;
