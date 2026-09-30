@@ -53,6 +53,26 @@
     background:rgba(255,255,255,.18);color:var(--crema);text-align:center;
   }
   .chip input.chip-stock::placeholder{color:rgba(255,255,255,.65);}
+  .chip .chip-label{cursor:text;}
+  .chip button.chip-edit{background:none;width:auto;height:auto;font-size:13px;padding:0 2px;opacity:.8;border-radius:0;}
+  .chip button.chip-edit:hover{opacity:1;}
+  .chip.chip-editing{background:var(--oro);color:var(--tinta);padding:4px 6px 4px 8px;}
+  .chip input.chip-name{
+    width:150px;padding:4px 8px;border-radius:6px;border:none;font-size:12.5px;font-weight:600;
+    background:#fff;color:var(--tinta);font-family:'Manrope';
+  }
+  .chip.chip-editing button{background:var(--verde-800);color:var(--crema);width:22px;height:22px;font-size:12px;}
+  .cat-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
+  .linkbtn{background:none;border:none;color:var(--verde-800);text-decoration:underline;cursor:pointer;font-size:12px;padding:0;font-weight:700;font-family:'Manrope';}
+  .linkbtn.danger{color:var(--terracota);}
+  .delcat-box{
+    display:none;margin-top:8px;padding:12px;border:1px solid var(--terracota);border-radius:10px;
+    background:#fbf3ee;font-size:12.5px;color:var(--tinta);line-height:1.45;
+  }
+  .delcat-box select{margin:8px 0;}
+  .delcat-box .delcat-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .delcat-box .btn{padding:8px 12px;font-size:12.5px;}
+  .btn-danger-solid{background:var(--terracota);color:#fff;}
   .item .aromas-tag{font-size:11px;color:var(--tinta-suave);margin-bottom:6px;}
   .stock-tag{font-size:11.5px;font-weight:700;color:var(--ok);margin-bottom:6px;}
   .stock-tag.stock-low{color:var(--terracota);}
@@ -133,11 +153,18 @@
           <input type="text" id="fNuevaCategoria" placeholder="Ej: Inciensos importados">
           <button class="btn btn-secondary" id="addCatBtn" type="button">Agregar</button>
         </div>
-        <button type="button" id="toggleNewCatBtn"
-          style="background:none;border:none;color:var(--verde-800);text-decoration:underline;
-          cursor:pointer;font-size:12px;margin-top:6px;padding:0;font-weight:700;">
-          + Agregar categoría nueva
-        </button>
+        <div class="cat-links">
+          <button type="button" class="linkbtn" id="toggleNewCatBtn">+ Agregar categoría nueva</button>
+          <button type="button" class="linkbtn danger" id="toggleDelCatBtn">🗑️ Eliminar esta categoría</button>
+        </div>
+        <div class="delcat-box" id="delCatBox">
+          <div id="delCatMsg"></div>
+          <select id="delCatDestino"></select>
+          <div class="delcat-actions">
+            <button type="button" class="btn btn-danger-solid" id="delCatConfirmBtn">Eliminar categoría</button>
+            <button type="button" class="btn btn-secondary" id="delCatCancelBtn">Cancelar</button>
+          </div>
+        </div>
       </div>
       <div>
         <label>Precio ($)</label>
@@ -179,6 +206,8 @@
         <div class="hint" style="margin-top:6px;font-size:12px;color:var(--tinta-suave)">
           Si cargás aromas, el cliente va a poder elegir uno antes de agregar el producto al carrito.
           Si no cargás ninguno, el producto se agrega directo, sin selector.<br>
+          Para <b>cambiar el nombre de un aroma</b> sin borrarlo, tocá su nombre o el lápiz ✎, corregilo y
+          apretá Enter (o ✓). Se conserva su stock.<br>
           Además, si cargás aromas, el <b>stock se maneja por aroma</b> (el campo "Stock interno" de
           arriba se oculta): ponéle un número a cada aroma en el cuadrito junto a su nombre. Dejalo
           vacío si no querés controlar el stock de ese aroma en particular.
@@ -227,20 +256,29 @@
 <script>
 const CATEGORIAS_BASE = ["Accesorios del Hogar","Decoración Holística","Sahumerios","Defumación","Difusores & Esencias","Velas & Velones","Cristales & Cuarzos"];
 
-const CAT_STORAGE_KEY = 'sahumo_categorias_admin_v1';
-let CATEGORIAS = CATEGORIAS_BASE.slice();
+const CAT_STORAGE_KEY = 'sahumo_categorias_admin_v1';     // version vieja: solo guardaba las agregadas
+const CAT_STORAGE_KEY_V2 = 'sahumo_categorias_admin_v2';  // ahora se guarda la lista completa (permite eliminar)
+let CATEGORIAS = null;
 try {
-  const savedCats = JSON.parse(localStorage.getItem(CAT_STORAGE_KEY) || '[]');
-  if (Array.isArray(savedCats)) {
-    savedCats.forEach(c => { if (c && !CATEGORIAS.includes(c)) CATEGORIAS.push(c); });
-  }
+  const v2 = JSON.parse(localStorage.getItem(CAT_STORAGE_KEY_V2) || 'null');
+  if (Array.isArray(v2) && v2.length) CATEGORIAS = v2.filter(Boolean);
 } catch(e){}
+if (!CATEGORIAS || !CATEGORIAS.length) {
+  CATEGORIAS = CATEGORIAS_BASE.slice();
+  try {
+    const savedCats = JSON.parse(localStorage.getItem(CAT_STORAGE_KEY) || '[]');
+    if (Array.isArray(savedCats)) {
+      savedCats.forEach(c => { if (c && !CATEGORIAS.includes(c)) CATEGORIAS.push(c); });
+    }
+  } catch(e){}
+}
 
 function persistCategorias(){
-  try {
-    const extra = CATEGORIAS.filter(c => !CATEGORIAS_BASE.includes(c));
-    localStorage.setItem(CAT_STORAGE_KEY, JSON.stringify(extra));
-  } catch(e){}
+  try { localStorage.setItem(CAT_STORAGE_KEY_V2, JSON.stringify(CATEGORIAS)); } catch(e){}
+}
+
+function esc(s){
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 let PRODUCTOS = [];
@@ -371,10 +409,12 @@ async function syncStockFromSheet(showToast){
 
 function money(n){ return '$' + Number(n||0).toLocaleString('es-AR'); }
 
-function toast(msg){
+let toastTimer = null;
+function toast(msg, ms){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2200);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), ms || 2200);
 }
 
 // populate selects
@@ -384,12 +424,22 @@ const catFilter = document.getElementById('catFilter');
 function renderCategorySelects(selected){
   const prevFCat = selected || fCategoria.value || CATEGORIAS[0];
   const prevFilter = catFilter.value;
-  fCategoria.innerHTML = CATEGORIAS.map(c=>`<option value="${c}">${c}</option>`).join('');
-  catFilter.innerHTML = `<option value="">Todas las categorías</option>` + CATEGORIAS.map(c=>`<option value="${c}">${c}</option>`).join('');
-  fCategoria.value = prevFCat;
-  catFilter.value = prevFilter;
+  fCategoria.innerHTML = CATEGORIAS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  catFilter.innerHTML = `<option value="">Todas las categorías</option>` + CATEGORIAS.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  fCategoria.value = CATEGORIAS.includes(prevFCat) ? prevFCat : CATEGORIAS[0];
+  catFilter.value = CATEGORIAS.includes(prevFilter) ? prevFilter : '';
 }
 renderCategorySelects();
+
+// Si un producto usa una categoría que no está en la lista (por ej. vino en
+// productos.js), se agrega sola para que no quede "en blanco" al editarlo.
+function ensureCategoriasFromProductos(){
+  let agregadas = false;
+  PRODUCTOS.forEach(p => {
+    if (p && p.categoria && !CATEGORIAS.includes(p.categoria)) { CATEGORIAS.push(p.categoria); agregadas = true; }
+  });
+  if (agregadas) { persistCategorias(); renderCategorySelects(); }
+}
 
 // ---- Agregar categoría nueva ----
 const toggleNewCatBtn = document.getElementById('toggleNewCatBtn');
@@ -400,7 +450,7 @@ toggleNewCatBtn.onclick = ()=>{
   const showing = newCatRow.style.display !== 'none';
   newCatRow.style.display = showing ? 'none' : 'flex';
   toggleNewCatBtn.textContent = showing ? '+ Agregar categoría nueva' : '✕ Cancelar';
-  if(!showing) fNuevaCategoria.focus();
+  if(!showing){ closeDelCat(); fNuevaCategoria.focus(); }
 };
 
 function addCategoriaFromInput(){
@@ -419,6 +469,65 @@ function addCategoriaFromInput(){
   toast('✅ Categoría "' + val + '" agregada');
 }
 document.getElementById('addCatBtn').onclick = addCategoriaFromInput;
+
+// ---- Eliminar categoría ----
+const toggleDelCatBtn = document.getElementById('toggleDelCatBtn');
+const delCatBox = document.getElementById('delCatBox');
+const delCatDestino = document.getElementById('delCatDestino');
+
+function closeDelCat(){
+  delCatBox.style.display = 'none';
+  toggleDelCatBtn.textContent = '🗑️ Eliminar esta categoría';
+}
+
+function openDelCat(){
+  const cat = fCategoria.value;
+  if (CATEGORIAS.length <= 1) { toast('⚠️ Tiene que quedar al menos una categoría'); return; }
+  const usados = PRODUCTOS.filter(p => p.categoria === cat).length;
+  // cerrar "agregar categoría" si estaba abierto
+  newCatRow.style.display = 'none';
+  toggleNewCatBtn.textContent = '+ Agregar categoría nueva';
+
+  const msg = document.getElementById('delCatMsg');
+  if (usados) {
+    msg.innerHTML = `La categoría <b>${esc(cat)}</b> tiene <b>${usados} producto(s)</b>. ` +
+      `Para no perderlos, elegí a qué categoría pasarlos antes de eliminarla:`;
+    delCatDestino.innerHTML = CATEGORIAS.filter(c => c !== cat)
+      .map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    delCatDestino.style.display = '';
+  } else {
+    msg.innerHTML = `¿Eliminar la categoría <b>${esc(cat)}</b>? No tiene productos cargados.`;
+    delCatDestino.style.display = 'none';
+  }
+  delCatBox.dataset.cat = cat;
+  delCatBox.dataset.usados = usados;
+  delCatBox.style.display = 'block';
+  toggleDelCatBtn.textContent = '✕ Cancelar eliminación';
+}
+
+toggleDelCatBtn.onclick = () => {
+  if (delCatBox.style.display === 'block') closeDelCat(); else openDelCat();
+};
+document.getElementById('delCatCancelBtn').onclick = closeDelCat;
+fCategoria.addEventListener('change', closeDelCat);
+
+document.getElementById('delCatConfirmBtn').onclick = () => {
+  const cat = delCatBox.dataset.cat;
+  const usados = Number(delCatBox.dataset.usados || 0);
+  const destino = usados ? delCatDestino.value : null;
+  if (usados && !destino) { toast('⚠️ Elegí a qué categoría pasar los productos'); return; }
+
+  if (usados) PRODUCTOS.forEach(p => { if (p.categoria === cat) p.categoria = destino; });
+  CATEGORIAS = CATEGORIAS.filter(c => c !== cat);
+  persistCategorias();
+  persist();
+  renderCategorySelects(destino || CATEGORIAS[0]);
+  closeDelCat();
+  renderList();
+  toast(usados
+    ? `🗑️ Categoría "${cat}" eliminada · ${usados} producto(s) pasados a "${destino}"`
+    : `🗑️ Categoría "${cat}" eliminada`, 3500);
+};
 fNuevaCategoria.addEventListener('keydown', e=>{
   if(e.key === 'Enter'){ e.preventDefault(); addCategoriaFromInput(); }
 });
@@ -458,6 +567,8 @@ fImagen.addEventListener('change', e=>{
 });
 
 let currentAromas = []; // [{ nombre, stock }]
+let editingAroma = null; // índice del aroma cuyo nombre se está editando
+let aromasRenombrados = []; // [{ viejo, nuevo }] para avisar sobre Google Sheets
 
 function toggleStockField(){
   document.getElementById('stockFieldWrap').style.display = currentAromas.length ? 'none' : '';
@@ -465,20 +576,84 @@ function toggleStockField(){
 
 function renderChips(){
   const box = document.getElementById('aromaChips');
-  box.innerHTML = currentAromas.map((a,i)=>`
-    <span class="chip">${a.nombre}
+  box.innerHTML = currentAromas.map((a,i)=> i === editingAroma ? `
+    <span class="chip chip-editing">
+      <input type="text" class="chip-name" data-i="${i}" value="${esc(a.nombre)}" aria-label="Nuevo nombre del aroma">
+      <button type="button" data-ok="${i}" title="Guardar nombre">✓</button>
+    </span>
+  ` : `
+    <span class="chip"><span class="chip-label" data-edit="${i}" title="Tocá para cambiar el nombre">${esc(a.nombre)}</span>
+      <button type="button" class="chip-edit" data-edit="${i}" title="Cambiar nombre" aria-label="Cambiar nombre de ${esc(a.nombre)}">✎</button>
       <input type="number" class="chip-stock" data-i="${i}" min="0" placeholder="stock"
         value="${(a.stock===null||a.stock===undefined) ? '' : a.stock}">
-      <button type="button" data-i="${i}">✕</button>
+      <button type="button" data-del="${i}" title="Quitar aroma" aria-label="Quitar ${esc(a.nombre)}">✕</button>
     </span>
   `).join('');
   toggleStockField();
+  if (editingAroma !== null) {
+    const inp = box.querySelector('input.chip-name');
+    if (inp) { inp.focus(); inp.select(); }
+  }
 }
-document.getElementById('aromaChips').addEventListener('click', e=>{
-  const btn = e.target.closest('button[data-i]');
-  if(!btn) return;
-  currentAromas.splice(Number(btn.dataset.i),1);
+
+// Guarda el nombre nuevo. Devuelve true si se pudo (o si no había nada que guardar).
+function commitAromaEdit(i, silencioso){
+  if (editingAroma !== i) return true;
+  const inp = document.querySelector('#aromaChips input.chip-name');
+  const viejo = currentAromas[i].nombre;
+  const nuevo = inp ? inp.value.trim() : viejo;
+  if (!nuevo) {
+    if (silencioso) { editingAroma = null; renderChips(); return true; }
+    toast('⚠️ El aroma no puede quedar sin nombre'); return false;
+  }
+  if (currentAromas.some((a,j) => j !== i && a.nombre.toLowerCase() === nuevo.toLowerCase())) {
+    if (silencioso) { editingAroma = null; renderChips(); return true; }
+    toast('⚠️ Ya hay otro aroma con ese nombre'); return false;
+  }
+  editingAroma = null;
+  if (nuevo !== viejo) {
+    currentAromas[i].nombre = nuevo;
+    const prev = aromasRenombrados.find(r => r.nuevo === viejo);
+    if (prev) prev.nuevo = nuevo; else aromasRenombrados.push({ viejo, nuevo });
+  }
   renderChips();
+  return true;
+}
+function cancelAromaEdit(){
+  editingAroma = null;
+  renderChips();
+}
+
+document.getElementById('aromaChips').addEventListener('click', e=>{
+  const del = e.target.closest('button[data-del]');
+  if (del) {
+    const i = Number(del.dataset.del);
+    currentAromas.splice(i,1);
+    if (editingAroma !== null) editingAroma = (editingAroma === i) ? null : (editingAroma > i ? editingAroma - 1 : editingAroma);
+    renderChips();
+    return;
+  }
+  const ok = e.target.closest('button[data-ok]');
+  if (ok) { commitAromaEdit(Number(ok.dataset.ok)); return; }
+  const ed = e.target.closest('[data-edit]');
+  if (ed) {
+    if (editingAroma !== null && !commitAromaEdit(editingAroma)) return;
+    editingAroma = Number(ed.dataset.edit);
+    renderChips();
+  }
+});
+document.getElementById('aromaChips').addEventListener('keydown', e=>{
+  const inp = e.target.closest('input.chip-name');
+  if (!inp) return;
+  if (e.key === 'Enter') { e.preventDefault(); commitAromaEdit(Number(inp.dataset.i)); }
+  else if (e.key === 'Escape') { e.preventDefault(); cancelAromaEdit(); }
+});
+document.getElementById('aromaChips').addEventListener('focusout', e=>{
+  const inp = e.target.closest('input.chip-name');
+  if (!inp) return;
+  // si el foco va al botón ✓ del mismo chip, dejamos que lo maneje el click
+  if (e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('button[data-ok]')) return;
+  setTimeout(()=> commitAromaEdit(Number(inp.dataset.i), true), 0);
 });
 document.getElementById('aromaChips').addEventListener('input', e=>{
   const inp = e.target.closest('.chip-stock');
@@ -490,7 +665,8 @@ function addAromaFromInput(){
   const input = document.getElementById('fAromaInput');
   const val = input.value.trim();
   if(!val) return;
-  if(!currentAromas.some(a=>a.nombre===val)) currentAromas.push({ nombre: val, stock: null });
+  if(currentAromas.some(a=>a.nombre.toLowerCase()===val.toLowerCase())){ toast('⚠️ Ese aroma ya está cargado'); return; }
+  currentAromas.push({ nombre: val, stock: null });
   input.value = '';
   renderChips();
   input.focus();
@@ -511,6 +687,8 @@ function resetForm(){
   imgPreview.style.display='none';
   imgHint.textContent = 'Tocá acá para elegir una foto desde tu celular o compu';
   currentAromas = [];
+  editingAroma = null;
+  aromasRenombrados = [];
   document.getElementById('fAromaInput').value = '';
   renderChips();
   editIndex = null;
@@ -522,6 +700,7 @@ function resetForm(){
 document.getElementById('cancelBtn').onclick = resetForm;
 
 document.getElementById('saveBtn').onclick = ()=>{
+  if (editingAroma !== null && !commitAromaEdit(editingAroma)) return;
   const categoria = document.getElementById('fCategoria').value;
   const nombre = document.getElementById('fNombre').value.trim();
   const marca = document.getElementById('fMarca').value.trim();
@@ -552,7 +731,13 @@ document.getElementById('saveBtn').onclick = ()=>{
   if(editIndex !== null){
     PRODUCTOS[editIndex] = producto;
     finalIndex = editIndex;
-    toast('✅ Producto actualizado');
+    const renombres = aromasRenombrados.filter(r => r.viejo !== r.nuevo);
+    if (renombres.length && typeof STOCK_API_URL !== 'undefined' && STOCK_API_URL) {
+      toast('✅ Producto actualizado · En Google Sheets revisá la fila vieja de: ' +
+        renombres.map(r => r.viejo).join(', '), 6000);
+    } else {
+      toast('✅ Producto actualizado');
+    }
   } else {
     PRODUCTOS.push(producto);
     finalIndex = PRODUCTOS.length - 1;
@@ -580,6 +765,8 @@ document.getElementById('saveBtn').onclick = ()=>{
 function editProduct(i){
   const p = PRODUCTOS[i];
   editIndex = i;
+  closeDelCat();
+  if (p.categoria && !CATEGORIAS.includes(p.categoria)) { CATEGORIAS.push(p.categoria); persistCategorias(); renderCategorySelects(); }
   document.getElementById('fCategoria').value = p.categoria;
   document.getElementById('fPrecio').value = p.precio;
   document.getElementById('fNombre').value = p.nombre;
@@ -593,6 +780,8 @@ function editProduct(i){
     ? { nombre: a, stock: null }
     : { nombre: a.nombre, stock: (a.stock===undefined ? null : a.stock) }
   ) : [];
+  editingAroma = null;
+  aromasRenombrados = [];
   renderChips();
   document.getElementById('formTitle').textContent = '✏️ Editando: ' + p.nombre;
   document.getElementById('cancelBtn').style.display = 'inline-block';
@@ -631,6 +820,7 @@ function isZeroStock(p){
 }
 
 function renderList(){
+  ensureCategoriasFromProductos();
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
   const cat = document.getElementById('catFilter').value;
   const lowStockOnly = document.getElementById('lowStockFilter').checked;
