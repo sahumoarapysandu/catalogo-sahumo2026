@@ -76,22 +76,32 @@
   /* ---------- NAV CATEGORIAS ---------- */
   .catnav{
     position:sticky; top:0; z-index:40;
-    background:rgba(246,240,226,0.92); backdrop-filter:blur(8px);
+    background:rgba(246,240,226,0.94); backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
     display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:12px 16px;
   }
   .catnav button{
-    flex:0 0 auto; border:1px solid var(--line); background:transparent;
-    color:var(--tinta); padding:9px 16px; border-radius:100px; font-family:'Manrope';
-    font-size:13px; font-weight:600; cursor:pointer; transition:.2s;
-    white-space:nowrap;
+    flex:0 0 auto; border:1px solid rgba(32,36,28,0.22); background:#fff;
+    color:var(--tinta); padding:10px 16px; border-radius:6px; font-family:'Manrope';
+    font-size:13px; font-weight:700; cursor:pointer; transition:background .2s, color .2s, border-color .2s;
+    white-space:nowrap; box-shadow:inset 0 -3px 0 var(--crema-2, #efe6d0);
   }
-  .catnav button.active, .catnav button:hover{
+  .catnav button:hover{ border-color:var(--oro); box-shadow:inset 0 -3px 0 var(--oro); }
+  .catnav button.active{
     background:var(--verde-800); color:var(--crema); border-color:var(--verde-800);
+    box-shadow:inset 0 -3px 0 var(--oro);
+  }
+  .catnav button:focus-visible{ outline:2px solid var(--oro); outline-offset:2px; }
+  /* "Productos" (ver todo) separado del resto con una línea dorada */
+  .catnav button.cat-all{ position:relative; margin-right:10px; }
+  .catnav button.cat-all::after{
+    content:''; position:absolute; right:-10px; top:15%; bottom:15%; width:1px; background:var(--oro);
   }
   @media (max-width:480px){
     .catnav{ gap:6px; padding:10px 12px; }
-    .catnav button{ padding:7px 11px; font-size:11.5px; }
+    .catnav button{ padding:8px 11px; font-size:11.5px; }
+    .catnav button.cat-all{ margin-right:0; }
+    .catnav button.cat-all::after{ display:none; }
   }
 
   /* ---------- BUSCADOR ---------- */
@@ -403,9 +413,11 @@ const categories = [...new Set(PRODUCTS.map(p=>p.category))];
 const catnav = document.getElementById('catnav');
 const catalog = document.getElementById('catalog');
 
-// Botón "Todos" para volver a ver el catálogo completo
+// Botón "Productos" para volver a ver el catálogo completo
 const allBtn = document.createElement('button');
-allBtn.textContent = 'Todos';
+allBtn.textContent = 'Productos';
+allBtn.className = 'cat-all';
+allBtn.dataset.cat = '';
 allBtn.classList.add('active');
 allBtn.onclick = ()=>{ setActiveCategory(null); };
 catnav.appendChild(allBtn);
@@ -413,7 +425,7 @@ catnav.appendChild(allBtn);
 function showCategory(cat){
   // Marca el botón activo
   [...catnav.children].forEach(b=>{
-    b.classList.toggle('active', b.textContent === (cat || 'Todos'));
+    b.classList.toggle('active', b.dataset.cat === (cat || ''));
   });
   // Muestra solo la sección elegida (o todas si cat es null)
   [...catalog.children].forEach(section=>{
@@ -430,6 +442,7 @@ function setActiveCategory(cat){
 categories.forEach((cat,i)=>{
   const btn = document.createElement('button');
   btn.textContent = cat;
+  btn.dataset.cat = cat;
   btn.onclick = ()=>{ setActiveCategory(cat); };
   catnav.appendChild(btn);
 
