@@ -319,6 +319,8 @@
   /* ---------- COMO COMPRAR / FERIAS ---------- */
   .info{background:var(--crema-2); border-top:1px solid var(--line); padding:56px 20px 64px; scroll-margin-top:70px;}
   .info-inner{max-width:1080px; margin:0 auto;}
+  .info[hidden]{display:none;}
+  .info{border-top:none; padding-top:40px; min-height:60vh;}
   .info h2{font-size:clamp(26px,4vw,34px); margin:0 0 6px;}
   .info .lead{color:var(--tinta-suave); font-size:15px; margin:0 0 28px; max-width:60ch; line-height:1.55;}
   .pasos{list-style:none; margin:0 0 44px; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:26px;}
@@ -409,11 +411,6 @@
   .btn-cat{background:var(--verde-800); color:var(--crema); border:none; cursor:pointer; font-family:'Manrope'; font-weight:700; font-size:14.5px; padding:13px 22px; border-radius:10px;}
   .btn-cat:hover{background:var(--oro); color:var(--tinta);}
   .btn-cat:focus-visible{outline:2px solid var(--oro); outline-offset:3px;}
-  /* "Quiénes somos" en la barra, separado de las categorías con una línea dorada */
-  .catnav button.cat-nos{position:relative; margin-left:10px;}
-  .catnav button.cat-nos::before{content:''; position:absolute; left:-10px; top:15%; bottom:15%; width:1px; background:var(--oro);}
-  @media (max-width:480px){ .catnav button.cat-nos{margin-left:0;} .catnav button.cat-nos::before{display:none;} }
-
   footer{
     background:var(--verde-900); color:#cfc7ad; text-align:center; padding:30px 20px; font-size:12.5px;
   }
@@ -433,7 +430,7 @@
     <span><b>José Luis</b> 3794-310743</span>
   </div>
   <a class="hero-info-link" href="#quienes-somos" id="heroNosotros">Quiénes somos</a>
-  <a class="hero-info-link" href="#como-comprar" style="margin-left:18px">Cómo comprar y dónde estamos</a>
+  <a class="hero-info-link" href="#como-comprar" id="heroComprar" style="margin-left:18px">Cómo comprar y dónde estamos</a>
 </div>
 
 <div class="catnav" id="catnav"></div>
@@ -528,7 +525,7 @@
   <div class="detail-modal" id="detailModal"></div>
 </div>
 
-<section class="info" id="como-comprar">
+<section class="info" id="como-comprar" hidden>
   <div class="info-inner">
     <h2>Cómo comprar</h2>
     <p class="lead">Armás tu pedido acá en el catálogo y lo terminamos de coordinar por WhatsApp. También podés venir a vernos a la feria.</p>
@@ -580,6 +577,7 @@
         </div>
       </div>
     </div>
+    <div class="cta"><button class="btn-cat" id="comprarVerCatalogo">Ver los productos</button></div>
   </div>
 </section>
 
@@ -643,7 +641,7 @@ function showCategory(cat){
 }
 
 function setActiveCategory(cat){
-  hideNosotros();
+  mostrarVista(null);
   currentCategory = cat;
   showCategory(cat);
   window.scrollTo({ top: catalog.offsetTop - 80, behavior: 'smooth' });
@@ -1004,35 +1002,31 @@ waMenu.addEventListener('click', e=>{ if(e.target.closest('a')) setWaMenu(false)
 document.addEventListener('click', e=>{ if(!e.target.closest('#waMenu')) setWaMenu(false); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') setWaMenu(false); });
 
-// ---------- QUIÉNES SOMOS (como una pestaña más de la barra) ----------
-const nosotrosSec = document.getElementById('quienes-somos');
+// ---------- QUIÉNES SOMOS / CÓMO COMPRAR: se ven solos, sin los productos ----------
 const searchbarEl = document.getElementById('searchbar');
-const nosBtn = document.createElement('button');
-nosBtn.textContent = 'Quiénes somos';
-nosBtn.className = 'cat-nos';
-nosBtn.dataset.cat = '__nosotros';
-catnav.appendChild(nosBtn);
+const VISTAS = { 'quienes-somos': document.getElementById('quienes-somos'), 'como-comprar': document.getElementById('como-comprar') };
 
-function showNosotros(){
-  nosotrosSec.hidden = false;
-  // Los productos siguen visibles debajo, con todas las categorías
-  currentCategory = null;
-  if(!searchQuery.trim()) showCategory(null);
-  [...catnav.children].forEach(b=>b.classList.toggle('active', b === nosBtn));
-  if(location.hash !== '#quienes-somos') history.replaceState(null,'','#quienes-somos');
-  window.scrollTo({ top: nosotrosSec.offsetTop - catnav.offsetHeight, behavior: 'smooth' });
+// vista = 'quienes-somos', 'como-comprar' o null (catálogo)
+function mostrarVista(vista){
+  Object.entries(VISTAS).forEach(([id, el])=>{ el.hidden = (id !== vista); });
+  catalog.style.display = vista ? 'none' : '';
+  searchbarEl.style.display = vista ? 'none' : '';
+  const hash = vista ? '#' + vista : '';
+  if(location.hash !== hash) history.replaceState(null, '', location.pathname + hash);
+  if(vista){
+    [...catnav.children].forEach(b=>b.classList.remove('active'));
+    window.scrollTo({ top: VISTAS[vista].offsetTop - catnav.offsetHeight, behavior: 'smooth' });
+  }
 }
-function hideNosotros(){
-  if(nosotrosSec.hidden) return;
-  nosotrosSec.hidden = true;
-  catalog.style.display = '';
-  searchbarEl.style.display = '';
-  if(location.hash === '#quienes-somos') history.replaceState(null,'',location.pathname);
+function abrirVista(vista){
+  return e=>{ e.preventDefault(); mostrarVista(vista); };
 }
-nosBtn.onclick = showNosotros;
-document.getElementById('heroNosotros').addEventListener('click', e=>{ e.preventDefault(); showNosotros(); });
+document.getElementById('heroNosotros').addEventListener('click', abrirVista('quienes-somos'));
+document.getElementById('heroComprar').addEventListener('click', abrirVista('como-comprar'));
 document.getElementById('nosVerCatalogo').onclick = ()=> setActiveCategory(null);
-if(location.hash === '#quienes-somos') showNosotros();
+document.getElementById('comprarVerCatalogo').onclick = ()=> setActiveCategory(null);
+const hashInicial = location.hash.slice(1);
+if(VISTAS[hashInicial]) mostrarVista(hashInicial);
 
 renderCart();
 </script>
