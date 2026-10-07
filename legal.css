@@ -1,0 +1,22 @@
+:root{--verde-900:#152318;--verde-800:#1e3626;--verde-700:#2b4d36;--oro:#c9a227;--oro-claro:#e8cf7a;--crema:#f6f0e2;--crema-2:#efe6d0;--tinta:#20241c;--tinta-suave:#5b5646;--terracota:#a85c32;--line:rgba(32,36,28,.12)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--crema);color:var(--tinta);font-family:Manrope,system-ui,sans-serif;font-size:16px;line-height:1.65}
+header{background:var(--verde-900);color:var(--crema);padding:14px 20px;display:flex;align-items:center;gap:14px}
+header .logo{width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid var(--oro);background:#fff;flex:none}
+header .logo img{width:100%;height:100%;object-fit:cover;display:block}
+header .marca{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:18px}
+header nav{margin-left:auto;display:flex;gap:16px;flex-wrap:wrap}
+header nav a{color:var(--oro-claro);font-size:13px;font-weight:700;text-decoration:none;border-bottom:1px solid rgba(232,207,122,.45)}
+main{max-width:760px;margin:0 auto;padding:36px 22px 60px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:34px;line-height:1.15;color:var(--verde-800);margin:0 0 6px}
+.fecha{color:var(--tinta-suave);font-size:13.5px;margin-bottom:26px}
+h2{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:21px;color:var(--verde-700);margin:32px 0 8px}
+p,li{max-width:68ch}
+a{color:var(--verde-700)}
+.aviso{background:var(--crema-2);border-left:4px solid var(--oro);padding:14px 18px;border-radius:6px;margin:20px 0}
+.falta{background:#fff1a6;color:#6b4b00;padding:0 4px;border-radius:3px;font-weight:700}
+.falta::before{content:"[completar: "}.falta::after{content:"]"}
+footer{background:var(--verde-900);color:#cfc7ad;text-align:center;padding:24px 20px;font-size:13px}
+footer a{color:var(--oro-claro);margin:0 8px}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--oro);outline-offset:2px}
+@media print{header nav,footer{display:none}.falta{background:#ffe866}}

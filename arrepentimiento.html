@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Política de cambios y devoluciones · Botón de arrepentimiento · Sahumo ArapySandú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="legal.css"><script src="datos-legales.js"></script><script src="config.js"></script>
+<style>
+  form{background:#fffdf7;border:1px solid var(--line);border-radius:12px;padding:22px;margin-top:22px;max-width:560px}
+  label{display:block;font-size:13.5px;font-weight:700;color:var(--tinta-suave);margin:14px 0 6px}
+  input,select,textarea{width:100%;padding:11px 12px;border-radius:8px;border:1px solid rgba(32,36,28,.25);font:inherit;font-size:15px;background:#fff}
+  textarea{min-height:80px;resize:vertical}
+  .opcional{font-weight:400}
+  .enviar{margin-top:20px;width:100%;padding:14px;border:none;border-radius:10px;background:var(--verde-800);color:#fff;font:800 15.5px Manrope,sans-serif;cursor:pointer}
+  .enviar:hover{background:var(--verde-700)}
+  .error{color:#a3261b;font-size:14px;margin-top:10px;display:none}
+  .codigo{display:none;margin-top:22px;background:var(--verde-800);color:var(--crema);border-radius:12px;padding:20px 22px;max-width:560px}
+  .codigo strong{display:block;font-family:Fraunces,Georgia,serif;font-size:26px;color:var(--oro-claro);letter-spacing:.5px;margin:4px 0 8px}
+  .codigo p{margin:6px 0}
+</style></head>
+<body>
+<header><a class="logo" href="index.html" aria-label="Volver al catálogo"><img src="logo.jpg" alt=""></a><span class="marca">Sahumo ArapySandú</span>
+<nav><a href="index.html">Catálogo</a><a href="terminos.html">Términos</a><a href="privacidad.html">Privacidad</a></nav></header>
+<main>
+<div style="font-weight:700;color:var(--terracota);font-size:15px;margin-bottom:2px">Política de cambios y devoluciones</div>
+<h1>Botón de arrepentimiento</h1>
+<p>Si compraste a distancia (por el catálogo o por WhatsApp), tenés <strong>10 días corridos</strong> desde que recibiste el producto o desde que se confirmó la compra para arrepentirte, sin explicar el motivo y sin costo. Completá este formulario y te confirmamos dentro de las 24 horas.</p>
+<p>Las condiciones están en los <a href="terminos.html">Términos y Condiciones</a> (punto 6).</p>
+
+<form id="form" novalidate>
+  <label for="nombre">Nombre y apellido</label>
+  <input id="nombre" autocomplete="name" required>
+  <label for="tel">Teléfono con el que hiciste el pedido</label>
+  <input id="tel" type="tel" autocomplete="tel" placeholder="Ej: 3794123456" required>
+  <label for="fecha">Fecha de la compra o de la entrega</label>
+  <input id="fecha" type="date" required>
+  <label for="prod">Productos que querés devolver</label>
+  <textarea id="prod" required placeholder="Ej: 1 pulsera de cuarzo rosa"></textarea>
+  <label for="motivo">Motivo <span class="opcional">(opcional)</span></label>
+  <input id="motivo">
+  <label for="vend">¿A quién le compraste?</label>
+  <select id="vend">
+    <option value="5493794004523">Patricia · 3794-004523</option>
+    <option value="5493794310743">José Luis · 3794-310743</option>
+  </select>
+  <button class="enviar" type="submit">Enviar solicitud de arrepentimiento</button>
+  <div class="error" id="error" role="alert">Completá nombre, teléfono, fecha y productos.</div>
+</form>
+
+<div class="codigo" id="codigo" aria-live="polite">
+  <p>Tu número de solicitud es</p>
+  <strong id="num"></strong>
+  <p>Guardalo. Se abrió WhatsApp con tu solicitud: enviá el mensaje para que nos llegue. Dentro de las 24 horas te confirmamos la solicitud por el mismo medio y coordinamos la devolución.</p>
+  <p>Si WhatsApp no se abrió, escribinos al número elegido con este número de solicitud<span data-si="email">, o a <span data-dato="email"></span></span>.</p>
+</div>
+</main>
+<footer><a href="index.html">Catálogo</a><a href="terminos.html">Términos y Condiciones</a><a href="privacidad.html">Política de Privacidad</a></footer>
+<script>
+document.getElementById('form').addEventListener('submit', function(e){
+  e.preventDefault();
+  var v = function(id){ return document.getElementById(id).value.trim(); };
+  var err = document.getElementById('error');
+  if (!v('nombre') || !v('tel') || !v('fecha') || !v('prod')) { err.style.display = 'block'; return; }
+  err.style.display = 'none';
+  var d = new Date();
+  var num = 'ARR-' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  var f = v('fecha').split('-').reverse().join('/');
+  var msg = 'SOLICITUD DE ARREPENTIMIENTO ' + num +
+    '\nNombre: ' + v('nombre') + '\nTeléfono: ' + v('tel') + '\nFecha de compra/entrega: ' + f +
+    '\nProductos: ' + v('prod') + (v('motivo') ? '\nMotivo: ' + v('motivo') : '');
+  // Registrar la solicitud en la planilla de Google (hoja "Arrepentimientos")
+  try {
+    if (typeof sendToSheet === 'function') {
+      var vsel = document.getElementById('vend');
+      sendToSheet({ action: 'arrepentimiento', numero: num, nombre: v('nombre'), telefono: v('tel'),
+                    fecha: f, productos: v('prod'), motivo: v('motivo'),
+                    vendedor: vsel.options[vsel.selectedIndex].text });
+    }
+  } catch(_) {}
+  document.getElementById('num').textContent = num;
+  document.getElementById('codigo').style.display = 'block';
+  window.open('https://wa.me/' + v('vend') + '?text=' + encodeURIComponent(msg), '_blank');
+  document.getElementById('codigo').scrollIntoView({behavior:'smooth', block:'center'});
+});
+</script>
+</body></html>
