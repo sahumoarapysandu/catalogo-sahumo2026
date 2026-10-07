@@ -536,17 +536,6 @@
       <option value="5493794004523">Patricia · 3794-004523</option>
       <option value="5493794310743">José Luis · 3794-310743</option>
     </select>
-    <label>¿Cómo pagás?</label>
-    <select id="formaPago">
-      <option>Efectivo</option>
-      <option>Transferencia</option>
-    </select>
-    <label>¿Cómo lo recibís?</label>
-    <select id="formaEntrega">
-      <option>Retiro en la feria</option>
-      <option>Envío a domicilio</option>
-    </select>
-    <div class="nota-envio" id="notaEnvio">El envío a domicilio es para compras superiores a $15.000.</div>
     <label class="acepto"><input type="checkbox" id="aceptoLegal"> <span>Acepto los <a href="terminos.html" target="_blank" rel="noopener">Términos y Condiciones</a> y la <a href="privacidad.html" target="_blank" rel="noopener">Política de Privacidad</a>, y el uso de mi nombre y teléfono para coordinar mi pedido.</span></label>
     <button class="send-btn" id="sendBtn" disabled>💬 Enviar pedido por WhatsApp</button>
   </div>
@@ -1012,8 +1001,6 @@ document.getElementById('sendBtn').onclick = ()=>{
     detalleItems.push(`${fullName} x${entry.qty} (${money(p.price)} c/u)`);
   });
   msg += `%0A*Total: $${total.toLocaleString('es-AR')}*`;
-  msg += `%0APago: ${document.getElementById('formaPago').value}`;
-  msg += `%0AEntrega: ${document.getElementById('formaEntrega').value}`;
 
   // Descontar stock automático y guardar el pedido, si está configurado (no bloquea el envío por WhatsApp)
   if (typeof STOCK_API_URL !== 'undefined' && STOCK_API_URL) {
@@ -1042,8 +1029,6 @@ document.getElementById('sendBtn').onclick = ()=>{
     currency: 'ARS',
     value: total,
     items: gaItems,
-    forma_pago: document.getElementById('formaPago').value,
-    forma_entrega: document.getElementById('formaEntrega').value,
     vendedor: vendedorNombre
   });
   gaEvent('pedido_whatsapp', { value: total, currency: 'ARS', vendedor: vendedorNombre });
@@ -1059,18 +1044,6 @@ document.getElementById('smoke').innerHTML = `
   <path d="M650,400 C630,300 690,260 650,180 C610,100 660,60 630,0" stroke="#e8cf7a" stroke-width="2" fill="none" opacity="0.4"/>
 </svg>`;
 
-// Aviso de monto mínimo para envío a domicilio
-function cartTotalNow(){
-  return Object.keys(cart).filter(k=>cart[k].qty>0).reduce((s,k)=>{
-    const p = PRODUCTS.find(x=>x.id==cart[k].id); return s + (p ? p.price*cart[k].qty : 0);
-  },0);
-}
-function updateNotaEnvio(){
-  const envio = document.getElementById('formaEntrega').value === 'Envío a domicilio';
-  document.getElementById('notaEnvio').style.display = (envio && cartTotalNow() <= 15000) ? 'block' : 'none';
-}
-document.getElementById('formaEntrega').addEventListener('change', updateNotaEnvio);
-document.getElementById('checkoutBtn').addEventListener('click', updateNotaEnvio);
 
 // Botón flotante de WhatsApp: abre un menú con los dos números
 const waFab = document.getElementById('waFab');
