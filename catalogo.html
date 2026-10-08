@@ -53,6 +53,7 @@
   .ayuda.oculta{opacity:0}
   #lupa{position:fixed; inset:0; z-index:1000; background:#0d160f; display:flex; flex-direction:column}
   #lupa[hidden]{display:none}
+  .lupa-bar #cerrarLupa{font-size:15px; padding:11px 20px; background:var(--oro); color:var(--verde-900); border-color:var(--oro)}
   .lupa-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px; color:var(--oro-claro); font-size:13px; flex:none}
   .lupa-scroll{flex:1; overflow:auto; -webkit-overflow-scrolling:touch; padding:0 10px 20px}
   .lupa-scroll img{-webkit-touch-callout:none; user-select:none; -webkit-user-select:none; -webkit-user-drag:none; display:block; width:100%; max-width:900px; margin:0 auto 12px; cursor:zoom-in; border-radius:4px}
@@ -216,10 +217,18 @@
       lupaScroll.appendChild(im);
     });
     lupa.hidden = false; lupaScroll.scrollTop = 0;
+    try { history.pushState({lupa:true}, ''); } catch(_){}
     document.getElementById('cerrarLupa').focus();
   });
   lupa.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  function cerrarLupa(){ lupa.hidden = true; document.getElementById('ampliar').focus(); }
+  function ocultarLupa(){ lupa.hidden = true; lupaScroll.innerHTML = ''; document.getElementById('ampliar').focus(); }
+  // Cerrar con el botón: vuelve un paso en el historial (así "atrás" no queda pendiente)
+  function cerrarLupa(){
+    if (lupa.hidden) return;
+    if (history.state && history.state.lupa) { history.back(); } else { ocultarLupa(); }
+  }
+  // Botón o gesto "atrás" del celular: cierra la lupa en lugar de salir del catálogo
+  window.addEventListener('popstate', function(){ if (!lupa.hidden) ocultarLupa(); });
   document.getElementById('cerrarLupa').addEventListener('click', cerrarLupa);
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lupa.hidden) cerrarLupa(); });
 
