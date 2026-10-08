@@ -96,7 +96,7 @@
   </div>
 </main>
 
-<p class="ayuda" id="ayuda">Tocá las flechas o deslizá la página para ver todos los productos</p>
+<p class="ayuda" id="ayuda">Deslizá para pasar de página · Pellizcá con dos dedos o tocá Ampliar para ver más grande</p>
 <footer>
   <button class="btn" id="prev" aria-label="Página anterior">‹ Anterior</button>
   <div id="contador" aria-live="polite">Tapa</div>
@@ -200,7 +200,7 @@
 
   // ---- Lupa: ver la página actual en grande ----
   var lupa = document.getElementById('lupa'), lupaScroll = document.getElementById('lupaScroll');
-  document.getElementById('ampliar').addEventListener('click', function(){
+  function abrirLupa(){
     var n = libro.getCurrentPageIndex(), ver = [n];
     var apaisado = libro.getOrientation && libro.getOrientation() === 'landscape';
     if (apaisado && n > 0 && n + 1 < TOTAL_PAGINAS) ver.push(n + 1);
@@ -219,7 +219,16 @@
     lupa.hidden = false; lupaScroll.scrollTop = 0;
     try { history.pushState({lupa:true}, ''); } catch(_){}
     document.getElementById('cerrarLupa').focus();
-  });
+  }
+  document.getElementById('ampliar').addEventListener('click', abrirLupa);
+
+  // Gesto con dos dedos sobre el catálogo (pellizcar): abre la vista ampliada
+  document.getElementById('wrap').addEventListener('touchstart', function(e){
+    if (e.touches.length >= 2 && lupa.hidden) {
+      e.preventDefault(); e.stopImmediatePropagation();
+      abrirLupa();
+    }
+  }, {capture:true, passive:false});
   lupa.addEventListener('contextmenu', function(e){ e.preventDefault(); });
   function ocultarLupa(){ lupa.hidden = true; lupaScroll.innerHTML = ''; document.getElementById('ampliar').focus(); }
   // Cerrar con el botón: vuelve un paso en el historial (así "atrás" no queda pendiente)
