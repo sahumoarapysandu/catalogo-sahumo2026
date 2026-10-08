@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Catálogo · Sahumo ArapySandú</title>
+<meta name="description" content="Catálogo de Sahumo ArapySandú: sahumerios, defumación, cristales y decoración holística. Corrientes Capital.">
+<meta property="og:title" content="Catálogo · Sahumo ArapySandú">
+<meta property="og:description" content="Sahumerios, defumación, cristales y decoración holística. Consultá precios por WhatsApp.">
+<meta property="og:image" content="https://www.sahumoarapysandu.com/catalogo/p-01.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,500&family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-900:#152318; --verde-800:#1e3626; --oro:#c9a227; --oro-claro:#e8cf7a;
+    --crema:#f6f0e2; --crema-2:#efe6d0;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    background:radial-gradient(ellipse at 50% 45%, #22392a 0%, var(--verde-900) 70%);
+    color:var(--crema); font-family:Manrope, system-ui, sans-serif;
+    display:flex; flex-direction:column; min-height:100%;
+    padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
+  }
+  header{display:flex; align-items:center; gap:14px; padding:14px 20px; flex:none}
+  .logo{width:46px; height:46px; border-radius:50%; overflow:hidden; border:2px solid var(--oro); background:#fff; flex:none}
+  .logo img{width:100%; height:100%; object-fit:cover; display:block}
+  .titulo{font-family:Fraunces, Georgia, serif; font-weight:600; font-size:19px; line-height:1.1}
+  .titulo small{display:block; font-family:Fraunces, Georgia, serif; font-style:italic; font-weight:500; font-size:13px; color:var(--oro-claro)}
+  header nav{margin-left:auto; display:flex; gap:18px; align-items:center}
+  header nav a{color:var(--oro-claro); font-size:13px; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(232,207,122,.45); padding-bottom:2px}
+  header nav a:hover{color:#fff; border-color:#fff}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--oro); outline-offset:3px}
+
+  main{flex:1; display:flex; align-items:center; justify-content:center; padding:4px 16px; min-height:0}
+  #wrap{width:100%; margin:0 auto; position:relative}
+  #book{margin:0 auto}
+  .pagina{background:var(--crema); overflow:hidden}
+  .pagina img{width:100%; height:100%; display:block; object-fit:cover; user-select:none; -webkit-user-select:none; -webkit-user-drag:none; -webkit-touch-callout:none; pointer-events:none}
+  #book{-webkit-touch-callout:none; user-select:none; -webkit-user-select:none}
+  .cargando{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:Fraunces, Georgia, serif; font-style:italic; color:var(--oro-claro)}
+
+  footer{flex:none; display:flex; align-items:center; justify-content:center; gap:14px; padding:12px 16px 16px; flex-wrap:wrap}
+  .btn{appearance:none; border:1px solid rgba(201,162,39,.55); background:transparent; color:var(--crema); font:700 14px Manrope, sans-serif; padding:10px 18px; border-radius:999px; cursor:pointer}
+  .btn:hover{background:rgba(201,162,39,.15)}
+  .btn:disabled{opacity:.35; cursor:default; background:transparent}
+  #contador{font-family:Fraunces, Georgia, serif; font-size:15px; min-width:120px; text-align:center; color:var(--crema-2)}
+  .wa{background:var(--oro); color:var(--verde-900); border-color:var(--oro); text-decoration:none}
+  .wa:hover{background:var(--oro-claro)}
+  .ayuda{text-align:center; font-size:12.5px; color:rgba(239,230,208,.7); margin:0 0 4px; transition:opacity .6s}
+  .ayuda.oculta{opacity:0}
+  noscript{display:block; text-align:center; padding:20px}
+  noscript a{color:var(--oro-claro)}
+
+  @media (max-width:640px){
+    header{padding:10px 14px; gap:10px}
+    .logo{width:38px; height:38px}
+    .titulo{font-size:16px}
+    header nav{gap:12px}
+    header nav a{font-size:12px}
+    .descargar-txt{display:none}
+    footer{gap:10px}
+    .btn{padding:9px 14px; font-size:13px}
+    #contador{min-width:90px; font-size:14px}
+  }
+  @media (prefers-reduced-motion: reduce){ .ayuda{transition:none} }
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="index.html" aria-label="Volver al catálogo"><img src="logo.jpg" alt=""></a>
+  <div class="titulo">Sahumo ArapySandú<small>Catálogo de productos</small></div>
+  <nav>
+    <a href="index.html">Hacer pedido</a>
+    <a href="Catalogo_Sahumo_arapysandu.pdf" download><span class="descargar-txt">Descargar </span>PDF</a>
+  </nav>
+</header>
+
+<main>
+  <div id="wrap">
+    <div id="book"></div>
+    <div class="cargando" id="cargando">Abriendo el catálogo…</div>
+  </div>
+</main>
+
+<p class="ayuda" id="ayuda">Tocá las flechas o deslizá la página para ver todos los productos</p>
+<footer>
+  <button class="btn" id="prev" aria-label="Página anterior">‹ Anterior</button>
+  <div id="contador" aria-live="polite">Tapa</div>
+  <button class="btn" id="next" aria-label="Página siguiente">Siguiente ›</button>
+  <a class="btn wa" href="https://wa.me/5493794310743?text=Hola!%20Vi%20el%20cat%C3%A1logo%20de%20Sahumo%20ArapySand%C3%BA%20y%20quiero%20consultar%20precios" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+</footer>
+
+<noscript>Para ver el catálogo deslizable necesitás JavaScript. También podés <a href="Catalogo_Sahumo_arapysandu.pdf">abrirlo en PDF</a>.</noscript>
+
+<script src="catalogo/page-flip.browser.js"></script>
+<script>
+(function(){
+  // ====== CONFIGURACIÓN: para una edición nueva, cambiá solo estos datos ======
+  var TOTAL_PAGINAS = 14;             // cantidad de imágenes p-01.jpg ... p-14.jpg
+  var CARPETA = 'catalogo/';
+  var PROPORCION = 1556 / 1100;       // alto / ancho de cada página (A4)
+  // ============================================================================
+
+  var paginas = [];
+  for (var i = 1; i <= TOTAL_PAGINAS; i++) paginas.push(CARPETA + 'p-' + String(i).padStart(2,'0') + '.jpg');
+
+  var wrap = document.getElementById('wrap');
+  var main = document.querySelector('main');
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var contador = document.getElementById('contador');
+  var ayuda = document.getElementById('ayuda');
+
+  // Calcula el ancho del libro para que entre completo en la pantalla
+  function ajustarAncho(){
+    var altoDisp = main.clientHeight - 8;
+    var anchoDisp = main.clientWidth - 32;
+    var dosPaginas = anchoDisp >= 700;
+    var porAlto = altoDisp / PROPORCION * (dosPaginas ? 2 : 1);
+    wrap.style.maxWidth = Math.max(260, Math.min(anchoDisp, porAlto)) + 'px';
+  }
+  ajustarAncho();
+
+  if (!window.St || !St.PageFlip){
+    document.getElementById('cargando').textContent = 'No se pudo cargar el catálogo. Recargá la página o abrilo en PDF.';
+    return;
+  }
+
+  var reducirMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var libro = new St.PageFlip(document.getElementById('book'), {
+    width: 550, height: Math.round(550 * PROPORCION),
+    size: 'stretch',
+    minWidth: 260, maxWidth: 1100,
+    minHeight: 360, maxHeight: 1600,
+    showCover: true,
+    usePortrait: true,
+    mobileScrollSupport: false,
+    maxShadowOpacity: 0.45,
+    flippingTime: reducirMovimiento ? 1 : 800
+  });
+  var cont = document.getElementById('book');
+  var nodos = paginas.map(function(src, k){
+    var d = document.createElement('div');
+    d.className = 'pagina';
+    if (k === 0) d.setAttribute('data-density', 'hard');
+    var im = document.createElement('img');
+    im.src = src; im.alt = 'Página ' + (k+1) + ' del catálogo'; im.draggable = false;
+    if (k > 3) im.loading = 'lazy';
+    d.appendChild(im); cont.appendChild(d); return d;
+  });
+  libro.loadFromHTML(nodos);
+
+  function nombrePagina(n){
+    if (n === 0) return 'Tapa';
+    if (n === TOTAL_PAGINAS - 1) return 'Cómo comprar';
+    var orient = libro.getOrientation ? libro.getOrientation() : 'landscape';
+    if (orient === 'landscape' && n + 1 < TOTAL_PAGINAS - 1) return 'Páginas ' + (n+1) + ' y ' + (n+2);
+    return 'Página ' + (n+1) + ' de ' + TOTAL_PAGINAS;
+  }
+  function actualizar(n){
+    contador.textContent = nombrePagina(n);
+    prev.disabled = n === 0;
+    next.disabled = n >= TOTAL_PAGINAS - 1;
+  }
+
+  libro.on('init', function(){ document.getElementById('cargando').remove(); actualizar(0); });
+  libro.on('flip', function(e){
+    actualizar(e.data);
+    ayuda.classList.add('oculta');
+    try { if (location.hash !== '#p' + (e.data+1)) history.replaceState(null, '', '#p' + (e.data+1)); } catch(_){}
+  });
+  libro.on('changeOrientation', function(){ actualizar(libro.getCurrentPageIndex()); });
+
+  // Evita el menú "Guardar imagen" (clic derecho en la compu, mantener apretado en el celular)
+  document.getElementById('wrap').addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  document.addEventListener('dragstart', function(e){ if (e.target.tagName === 'IMG') e.preventDefault(); });
+
+  prev.addEventListener('click', function(){ libro.flipPrev(); });
+  next.addEventListener('click', function(){ libro.flipNext(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight') libro.flipNext();
+    if (e.key === 'ArrowLeft') libro.flipPrev();
+  });
+
+  // Permite compartir un link a una página: revista.html#p8
+  var m = location.hash.match(/^#p(\d+)$/);
+  if (m){ var p = Math.min(TOTAL_PAGINAS, Math.max(1, +m[1])) - 1; libro.on('init', function(){ libro.turnToPage(p); actualizar(p); }); }
+
+  var t; window.addEventListener('resize', function(){ clearTimeout(t); t = setTimeout(function(){ ajustarAncho(); libro.update && libro.update(); }, 150); });
+})();
+</script>
+</body>
+</html>
