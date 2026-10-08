@@ -51,6 +51,13 @@
   .wa:hover{background:var(--oro-claro)}
   .ayuda{text-align:center; font-size:12.5px; color:rgba(239,230,208,.7); margin:0 0 4px; transition:opacity .6s}
   .ayuda.oculta{opacity:0}
+  #lupa{position:fixed; inset:0; z-index:1000; background:#0d160f; display:flex; flex-direction:column}
+  #lupa[hidden]{display:none}
+  .lupa-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px; color:var(--oro-claro); font-size:13px; flex:none}
+  .lupa-scroll{flex:1; overflow:auto; -webkit-overflow-scrolling:touch; padding:0 10px 20px}
+  .lupa-scroll img{display:block; width:100%; max-width:900px; margin:0 auto 12px; cursor:zoom-in; border-radius:4px}
+  .lupa-scroll.cerca img{width:230%; max-width:none; cursor:zoom-out}
+  .zoom{border-color:rgba(232,207,122,.7)}
   noscript{display:block; text-align:center; padding:20px}
   noscript a{color:var(--oro-claro)}
 
@@ -90,9 +97,14 @@
   <button class="btn" id="prev" aria-label="Página anterior">‹ Anterior</button>
   <div id="contador" aria-live="polite">Tapa</div>
   <button class="btn" id="next" aria-label="Página siguiente">Siguiente ›</button>
+  <button class="btn zoom" id="ampliar" aria-label="Ampliar la página">🔍 Ampliar</button>
   <a class="btn wa" href="https://wa.me/5493794310743?text=Hola!%20Vi%20el%20cat%C3%A1logo%20de%20Sahumo%20ArapySand%C3%BA%20y%20quiero%20consultar%20precios" target="_blank" rel="noopener">Consultar por WhatsApp</a>
 </footer>
 
+<div id="lupa" role="dialog" aria-modal="true" aria-label="Página ampliada" hidden>
+  <div class="lupa-bar"><span id="lupaTxt">Tocá la página para acercar o alejar</span><button class="btn" id="cerrarLupa">✕ Cerrar</button></div>
+  <div class="lupa-scroll" id="lupaScroll"></div>
+</div>
 <noscript>Para ver el catálogo deslizable necesitás JavaScript. También podés <a href="Catalogo_Sahumo_arapysandu.pdf">abrirlo en PDF</a>.</noscript>
 
 <script src="catalogo/page-flip.browser.js"></script>
@@ -178,9 +190,35 @@
   document.getElementById('wrap').addEventListener('contextmenu', function(e){ e.preventDefault(); });
   document.addEventListener('dragstart', function(e){ if (e.target.tagName === 'IMG') e.preventDefault(); });
 
+  // ---- Lupa: ver la página actual en grande ----
+  var lupa = document.getElementById('lupa'), lupaScroll = document.getElementById('lupaScroll');
+  document.getElementById('ampliar').addEventListener('click', function(){
+    var n = libro.getCurrentPageIndex(), ver = [n];
+    var apaisado = libro.getOrientation && libro.getOrientation() === 'landscape';
+    if (apaisado && n > 0 && n + 1 < TOTAL_PAGINAS) ver.push(n + 1);
+    lupaScroll.innerHTML = ''; lupaScroll.classList.remove('cerca');
+    ver.forEach(function(k){
+      var im = document.createElement('img'); im.src = paginas[k]; im.alt = 'Página ' + (k+1) + ' ampliada';
+      im.addEventListener('click', function(ev){
+        var r = im.getBoundingClientRect(), fx = (ev.clientX - r.left) / r.width, fy = (ev.clientY - r.top) / r.height;
+        var cerca = lupaScroll.classList.toggle('cerca');
+        if (cerca) { var r2 = im.getBoundingClientRect();
+          lupaScroll.scrollLeft = fx * r2.width - lupaScroll.clientWidth / 2;
+          lupaScroll.scrollTop  = im.offsetTop + fy * r2.height - lupaScroll.clientHeight / 2; }
+      });
+      lupaScroll.appendChild(im);
+    });
+    lupa.hidden = false; lupaScroll.scrollTop = 0;
+    document.getElementById('cerrarLupa').focus();
+  });
+  function cerrarLupa(){ lupa.hidden = true; document.getElementById('ampliar').focus(); }
+  document.getElementById('cerrarLupa').addEventListener('click', cerrarLupa);
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !lupa.hidden) cerrarLupa(); });
+
   prev.addEventListener('click', function(){ libro.flipPrev(); });
   next.addEventListener('click', function(){ libro.flipNext(); });
   document.addEventListener('keydown', function(e){
+    if (!document.getElementById('lupa').hidden) return;
     if (e.key === 'ArrowRight') libro.flipNext();
     if (e.key === 'ArrowLeft') libro.flipPrev();
   });
