@@ -58,6 +58,8 @@
   .lupa-scroll img{-webkit-touch-callout:none; user-select:none; -webkit-user-select:none; -webkit-user-drag:none; display:block; width:100%; max-width:900px; margin:0 auto 12px; cursor:zoom-in; border-radius:4px}
   .lupa-scroll.cerca img{width:230%; max-width:none; cursor:zoom-out}
   .zoom{border-color:rgba(232,207,122,.7)}
+  .wa-grupo{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center}
+  .wa-txt{font-size:13.5px; color:var(--crema-2); font-weight:700}
   noscript{display:block; text-align:center; padding:20px}
   noscript a{color:var(--oro-claro)}
 
@@ -71,6 +73,8 @@
     footer{gap:10px}
     .btn{padding:9px 14px; font-size:13px}
     #contador{min-width:90px; font-size:14px}
+    .wa-grupo{width:100%; gap:8px 10px}
+    .wa-txt{width:100%; text-align:center; font-size:12.5px}
   }
   @media (prefers-reduced-motion: reduce){ .ayuda{transition:none} }
 </style>
@@ -97,7 +101,11 @@
   <div id="contador" aria-live="polite">Tapa</div>
   <button class="btn" id="next" aria-label="Página siguiente">Siguiente ›</button>
   <button class="btn zoom" id="ampliar" aria-label="Ampliar la página">🔍 Ampliar</button>
-  <a class="btn wa" href="https://wa.me/5493794310743?text=Hola!%20Vi%20el%20cat%C3%A1logo%20de%20Sahumo%20ArapySand%C3%BA%20y%20quiero%20consultar%20precios" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+  <div class="wa-grupo">
+    <span class="wa-txt">Consultá por WhatsApp:</span>
+    <a class="btn wa" href="https://wa.me/5493794004523?text=Hola!%20Vi%20el%20cat%C3%A1logo%20de%20Sahumo%20ArapySand%C3%BA%20y%20quiero%20consultar%20precios" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp a Patricia, 3794-004523">Patricia</a>
+    <a class="btn wa" href="https://wa.me/5493794310743?text=Hola!%20Vi%20el%20cat%C3%A1logo%20de%20Sahumo%20ArapySand%C3%BA%20y%20quiero%20consultar%20precios" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp a José Luis, 3794-310743">José Luis</a>
+  </div>
 </footer>
 
 <div id="lupa" role="dialog" aria-modal="true" aria-label="Página ampliada" hidden>
