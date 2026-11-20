@@ -2253,5 +2253,119 @@ const GUIA = {
   "jade": [
    "jade"
   ]
- }
+ },
+ "ambientes": [
+  {
+   "id": "entrada",
+   "nombre": "Entrada",
+   "icono": "🚪",
+   "intro": "Es la puerta por donde entra toda la energía a la casa. Una piedra de protección ayuda a que lo que entre sea bueno.",
+   "piedras": [
+    "turmalina negra",
+    "cuarzo ahumado",
+    "obsidiana negra",
+    "cianita negra",
+    "pirita"
+   ],
+   "consejo": "Elegí una piedra grande o en bruto y ubicala cerca de la puerta, de un lado o en un mueble del recibidor. Limpiala seguido con sahumo: es la que más energía recibe.",
+   "productos": [
+    "piedras en bruto",
+    "kit turmalina"
+   ]
+  },
+  {
+   "id": "living",
+   "nombre": "Living y espacios compartidos",
+   "icono": "🛋️",
+   "intro": "Donde se reúne la familia. Las piedras de armonía ayudan a que la convivencia sea más tranquila.",
+   "piedras": [
+    "cuarzo cristal",
+    "cuarzo rosa",
+    "amatista",
+    "selenita",
+    "ágata fucsia"
+   ],
+   "consejo": "Una punta o pirámide de cuarzo cristal en el centro del ambiente armoniza todo el espacio. Las drusas y rodajas de ágata suman energía y decoran.",
+   "productos": [
+    "piramides",
+    "puntas de cristal",
+    "rodajas de agata"
+   ]
+  },
+  {
+   "id": "dormitorio",
+   "nombre": "Dormitorio",
+   "icono": "🛏️",
+   "intro": "Es el lugar del descanso y de la pareja. Acá van las piedras más suaves y tranquilas.",
+   "piedras": [
+    "amatista",
+    "cuarzo rosa",
+    "selenita",
+    "howlita",
+    "lepidolita"
+   ],
+   "consejo": "Poné una en la mesa de luz: amatista para descansar, cuarzo rosa para la pareja. Evitá las piedras muy energizantes (citrino, cornalina, pirita) cerca de la cama.",
+   "productos": [
+    "barra de selenita",
+    "piedras roladas",
+    "atrapasuenos"
+   ]
+  },
+  {
+   "id": "escritorio",
+   "nombre": "Escritorio y lugar de estudio",
+   "icono": "💻",
+   "intro": "Para concentrarse, ordenar las ideas y trabajar o estudiar con la mente clara.",
+   "piedras": [
+    "fluorita",
+    "sodalita",
+    "cuarzo cristal",
+    "lapislázuli",
+    "cianita azul"
+   ],
+   "consejo": "Ubicá la piedra al alcance de la vista mientras trabajás. La fluorita y la obsidiana se suelen poner junto a la computadora.",
+   "productos": [
+    "piramides",
+    "puntas de cristal",
+    "piedras roladas"
+   ]
+  },
+  {
+   "id": "negocio",
+   "nombre": "Negocio y caja",
+   "icono": "💰",
+   "intro": "Las piedras de la abundancia acompañan las ventas, los proyectos y el orden con el dinero.",
+   "piedras": [
+    "pirita",
+    "citrino",
+    "ojo de tigre",
+    "aventurina verde",
+    "cuarzo verde"
+   ],
+   "consejo": "Poné una pirita o un citrino en la caja registradora o en el cajón del dinero, y otra en la entrada del local para recibir a los clientes.",
+   "productos": [
+    "piedras roladas",
+    "piedras en bruto"
+   ]
+  },
+  {
+   "id": "meditacion",
+   "nombre": "Rincón de meditación o altar",
+   "icono": "🕯️",
+   "intro": "Un espacio propio para conectar, meditar, sahumar o hacer tus rituales.",
+   "piedras": [
+    "amatista",
+    "selenita",
+    "labradorita",
+    "cuarzo cristal",
+    "piedra de la luna"
+   ],
+   "consejo": "Armá tu rincón con una vela, tu sahumerio preferido y dos o tres piedras. La selenita sirve también para dejar cargando a las demás.",
+   "productos": [
+    "barra de selenita",
+    "puntas de cristal",
+    "velas"
+   ]
+  }
+ ]
 };

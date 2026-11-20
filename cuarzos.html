@@ -208,6 +208,13 @@
   .solo-marca small{ display:block; font-family:'Manrope',sans-serif; font-weight:600; font-size:11.5px; color:rgba(246,240,226,.75); }
   .solo-guia{ font:inherit; font-size:13px; font-weight:800; padding:8px 14px; border-radius:999px; border:none;
     background:var(--oro); color:var(--verde-900); cursor:pointer; }
+  /* ---------- PARA TU CASA ---------- */
+  .casa-lead{ color:var(--tinta-suave); margin:-6px 0 16px; max-width:720px; line-height:1.5; }
+  .bloque.casa{ margin-bottom:16px; }
+  .casa-ico{ font-size:26px; }
+  .casa-intro{ margin:6px 0 12px; font-size:14.5px; line-height:1.5; color:var(--tinta); }
+  .casa-tip{ margin-top:12px; background:#fff8e2; border-left:4px solid var(--oro); padding:10px 12px; border-radius:8px; font-size:14px; line-height:1.5; }
+  .casa-h4{ font-family:'Fraunces',serif; font-size:16px; margin:16px 0 0; color:var(--verde-700); }
   .acciones{ margin-top:14px; padding-top:12px; border-top:1px dashed rgba(32,36,28,.2); }
   .acc-tit{ display:block; font-size:13px; font-weight:800; color:var(--verde-700); margin-bottom:8px; }
   .acc-btns{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -261,6 +268,7 @@
     <div class="tabs" id="tabs">
       <button data-vista="piedras" class="activo"><i>💎</i><span class="l">Piedras</span><span class="c">Piedras</span></button>
       <button data-vista="situaciones"><i>🙋</i><span class="l">¿Qué te pasa?</span><span class="c">¿Qué te pasa?</span></button>
+      <button data-vista="casa"><i>🏠</i><span class="l">Para tu casa</span><span class="c">Tu casa</span></button>
       <button data-vista="profesiones"><i>💼</i><span class="l">Por profesión</span><span class="c">Profesión</span></button>
       <button data-vista="signos"><i>✨</i><span class="l">Por signo</span><span class="c">Signo</span></button>
       <button data-vista="chakras"><i>🌈</i><span class="l">Por chakra</span><span class="c">Chakra</span></button>
@@ -349,6 +357,7 @@ function chakrasDe(pi){
   const extra = GUIA.chakras.filter(c=> c.piedras.some(x=> fichaDe(x)===pi)).map(c=>c.nombre);
   return GUIA.chakras.map(c=>c.nombre).filter(n=> pi.chakras.includes(n) || extra.includes(n));
 }
+function ambientesDe(pi){ return (GUIA.ambientes||[]).filter(a=> a.piedras.some(x=> fichaDe(x)===pi)); }
 function profesionesDe(pi){ return GUIA.profesiones.filter(s=> s.piedras.some(x=> fichaDe(x)===pi)); }
 function situacionesDe(pi){ return GUIA.situaciones.filter(s=> s.piedras.some(x=> fichaDe(x)===pi)); }
 // "aventurina verde" en la tienda está como "venturina verde", etc.
@@ -458,6 +467,23 @@ function render(){
       : `<p class="vacio">No encontramos “${esc(q.value)}”.</p>`);
   }
 
+  if(vista==='casa'){
+    let lista = GUIA.ambientes || [];
+    if(t) lista = lista.filter(a=> norm(a.nombre + ' ' + a.piedras.join(' ') + ' ' + a.intro).includes(t));
+    main.innerHTML = `<h2 style="margin-top:0">Piedras para cada espacio de tu casa</h2>
+      <p class="casa-lead">Según la tradición del Feng Shui, cada ambiente tiene su energía. Elegí el espacio y descubrí qué piedras lo acompañan.</p>` +
+      (lista.length ? lista.map(a=>{
+        const prods = productosPara(a.productos).slice(0,6);
+        return `<div class="bloque casa">
+          <h3><span class="casa-ico">${a.icono}</span>${esc(a.nombre)}</h3>
+          <p class="casa-intro">${esc(a.intro)}</p>
+          <div class="chips">${a.piedras.map(chipPiedra).join('')}</div>
+          <div class="casa-tip">💡 ${esc(a.consejo)}</div>
+          ${prods.length ? `<h4 class="casa-h4">Ideal para este espacio</h4>` + htmlProductos(prods) : ''}
+        </div>`;}).join('') + leyendaChips()
+      : `<p class="vacio">No encontramos “${esc(q.value)}”.</p>`);
+  }
+
   if(vista==='chakras'){
     const ps = productosPara(['chakra','chackas']);
     main.innerHTML = '<div class="lista">' + GUIA.chakras.map((c,i)=>`
@@ -547,7 +573,7 @@ document.getElementById('tabs').addEventListener('click', e=>{
   cambiarVista(b.dataset.vista);
 });
 q.addEventListener('input', ()=>{
-  if(!['piedras','signos','situaciones','profesiones'].includes(vista)) cambiarVista('piedras'); else render();
+  if(!['piedras','signos','situaciones','profesiones','casa'].includes(vista)) cambiarVista('piedras'); else render();
 });
 
 // ---------------------------------------------------------------------
@@ -579,6 +605,7 @@ function abrirFicha(id, solo){
           ${chakrasDe(pi).length ? `<dt>Chakra</dt><dd>${chakrasDe(pi).join(', ')}</dd>` : ''}
           ${signos.length ? `<dt>Signos</dt><dd>${signos.map(s=>s.signo).join(', ')}</dd>` : ''}
           ${kits.length ? `<dt>Kits</dt><dd>${kits.map(k=>k.nombre).join(', ')}</dd>` : ''}
+          ${ambientesDe(pi).length ? `<dt>En casa</dt><dd>${ambientesDe(pi).map(a=>a.nombre).join(', ')}</dd>` : ''}
           ${situacionesDe(pi).length ? `<dt>Ayuda con</dt><dd>${situacionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
           ${profesionesDe(pi).length ? `<dt>Profesión</dt><dd>${profesionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
         </dl>
