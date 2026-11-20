@@ -474,7 +474,7 @@ function render(){
       <p class="casa-lead">Según la tradición del Feng Shui, cada ambiente tiene su energía. Elegí el espacio y descubrí qué piedras lo acompañan.</p>` +
       (lista.length ? lista.map(a=>{
         const prods = productosPara(a.productos).slice(0,6);
-        return `<div class="bloque casa">
+        return `<div class="bloque casa" id="casa-${a.id}">
           <h3><span class="casa-ico">${a.icono}</span>${esc(a.nombre)}</h3>
           <p class="casa-intro">${esc(a.intro)}</p>
           <div class="chips">${a.piedras.map(chipPiedra).join('')}</div>
@@ -672,7 +672,13 @@ document.getElementById('tabs').addEventListener('click', ()=>{
 if(window.innerWidth <= 640) q.placeholder = 'Buscá piedra, signo o lo que te pasa…';
 render();
 // Si alguien entra con un link directo (ej: cuarzos.html#amatista) se abre esa ficha
+// Links directos: #ficha-amatista (solo la ficha), #casa o #casa-dormitorio (pestaña Para tu casa), #amatista (ficha sobre la guía)
 if(location.hash.startsWith('#ficha-')) abrirFicha(location.hash.slice(7), true);
+else if(location.hash === '#casa' || location.hash.startsWith('#casa-')){
+  cambiarVista('casa');
+  const el = document.getElementById(location.hash.slice(1));
+  setTimeout(()=> (el || document.querySelector('.barra')).scrollIntoView({ behavior:'smooth', block:'start' }), 150);
+}
 else if(location.hash) abrirFicha(location.hash.slice(1));
 </script>
 </body>
