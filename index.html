@@ -431,6 +431,8 @@
     background:var(--verde-900); color:#cfc7ad; text-align:center; padding:30px 20px; font-size:12.5px;
   }
   footer b{color:var(--oro-claro);}
+  .contador{margin-top:10px; font-size:13px; letter-spacing:.02em;}
+  .contador b{font-size:15px;}
   footer{padding-bottom:96px;}
   .legal-links{margin-top:12px; display:flex; gap:8px 18px; justify-content:center; flex-wrap:wrap;}
   .legal-links a{color:var(--oro-claro); font-weight:700; text-decoration:none; border-bottom:1px solid rgba(232,207,122,.45);}
@@ -461,6 +463,7 @@
   </div>
   <a class="hero-info-link" href="#quienes-somos" id="heroNosotros">Quiénes somos</a>
   <a class="hero-info-link" href="#como-comprar" id="heroComprar" style="margin-left:18px">Cómo comprar y dónde estamos</a>
+  <a class="hero-info-link" href="cuarzos.html" style="margin-left:18px">🔮 Guía de cuarzos</a>
 </div>
 
 <div class="catnav" id="catnav"></div>
@@ -604,6 +607,7 @@
 <footer>
   <div><b>Sahumo ArapySandú</b> · Corrientes Capital</div>
   <div style="margin-top:6px">Catálogo interactivo — armá tu pedido y enviálo por WhatsApp para confirmar.</div>
+  <div class="contador" id="contadorVisitas" hidden>👁 <b id="numVisitas"></b> visitas</div>
   <div class="legal-links"><a href="terminos.html">Términos y Condiciones</a><a href="privacidad.html">Política de Privacidad</a><a href="arrepentimiento.html">Política de cambios y devoluciones · Botón de arrepentimiento</a></div>
 </footer>
 
@@ -1091,6 +1095,33 @@ const hashInicial = location.hash.slice(1);
 if(VISTAS[hashInicial]) mostrarVista(hashInicial);
 
 renderCart();
+
+// ---------- CONTADOR DE VISITAS (se guarda en la hoja "Contador" de tu planilla) ----------
+(function(){
+  if (typeof STOCK_API_URL === 'undefined' || !STOCK_API_URL) return;
+  let yaContada = false;
+  try { yaContada = sessionStorage.getItem('visitaContada') === '1'; } catch(e){}
+  // Cada persona suma una sola visita por sesión (recargar la página no suma de nuevo)
+  fetch(STOCK_API_URL + '?accion=' + (yaContada ? 'vervisitas' : 'visita'))
+    .then(r => r.json())
+    .then(d => {
+      if (!d || typeof d.visitas !== 'number') return;
+      try { sessionStorage.setItem('visitaContada', '1'); } catch(e){}
+      document.getElementById('numVisitas').textContent = d.visitas.toLocaleString('es-AR');
+      document.getElementById('contadorVisitas').hidden = false;
+    })
+    .catch(()=>{});
+})();
+
+// ---------- BÚSQUEDA DESDE LA GUÍA DE CUARZOS (index.html?buscar=amatista) ----------
+(function(){
+  const q = new URLSearchParams(location.search).get('buscar');
+  if(!q) return;
+  searchInput.value = q;
+  searchQuery = q;
+  applyFilters();
+  setTimeout(()=> window.scrollTo({ top: searchbarEl.offsetTop - catnav.offsetHeight, behavior: 'smooth' }), 300);
+})();
 </script>
 </body>
 </html>

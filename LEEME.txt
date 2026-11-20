@@ -193,3 +193,54 @@ COMO PUBLICARLO / ACTUALIZARLO ONLINE
 (Si ya tenias una cuenta y un sitio creado, podes simplemente volver
 a arrastrar la carpeta actualizada sobre el mismo sitio para
 reemplazarlo, sin perder el link)
+
+NOVEDAD: GUÍA DE CUARZOS (cuarzos.html)
+------------------------------------------
+Es una página nueva donde el público busca un cuarzo y ve su foto,
+propiedades, color, chakra, signos, kits, profesión, "¿qué te pasa?"
+(dinero, envidia, estrés...), cuidados y los productos
+de la tienda que lo tienen (con precio y botón "Ver en la tienda").
+En la tienda aparece un link nuevo arriba: "🔮 Guía de cuarzos".
+
+Archivos nuevos o cambiados:
+- cuarzos.html      -> la página de la guía (NO hace falta tocarla)
+- cuarzos-datos.js  -> los textos de cada piedra, signos, chakras, kits,
+                       profesiones y situaciones ("¿qué te pasa?")
+- index.html        -> se agregó el link a la guía y la búsqueda
+                       automática (index.html?buscar=amatista)
+
+Los productos relacionados se buscan SOLOS en productos.js: si cargás
+en el panel un producto o un aroma/variante con el nombre de la piedra
+(por ejemplo "amatista"), aparece automáticamente en su ficha.
+Conviene escribir los nombres siempre igual (ej: "rosa del desierto",
+no "rosa del decierto").
+
+Para cambiar un texto de una piedra: abrí cuarzos-datos.js con el Bloc
+de notas, buscá el nombre y cambiá lo que está entre comillas.
+
+Protección: en la guía no se puede seleccionar ni copiar el texto,
+no funciona el clic derecho, ni Ctrl+C / Ctrl+S / Ctrl+P, las fotos
+no se pueden arrastrar ni "guardar imagen" y llevan marca de agua.
+Ojo: esto frena al visitante común, pero nadie puede impedir del todo
+una captura de pantalla o que alguien experto mire el código.
+
+NOVEDAD: CONTADOR DE VISITAS
+------------------------------
+Al pie del catálogo aparece "👁 X visitas". Cada persona suma una sola
+visita por sesión (si recarga la página no suma de nuevo). El total se
+guarda en tu planilla de Google, en una hoja nueva llamada "Contador"
+(celda B2), que se crea sola con la primera visita.
+
+Para activarlo (una sola vez):
+1. Abrí tu planilla > Extensiones > Apps Script.
+2. Borrá todo el código y pegá el nuevo de google-apps-script.txt
+   (desde "var SPREADSHEET_ID" hasta el final del código). Guardá.
+3. Implementar > Gestionar implementaciones > ✏️ (editar) >
+   Versión: "Nueva versión" > Implementar. (Si no hacés este paso,
+   el contador no aparece.)
+4. Entrá una vez al catálogo para que se cree la hoja "Contador".
+5. En la hoja "Contador", escribí en la celda B2 el número de visitas
+   reales que te da Google Analytics. Desde ahí sigue sumando solo.
+
+Si el contador no se puede conectar, simplemente no se muestra
+(el catálogo funciona igual).

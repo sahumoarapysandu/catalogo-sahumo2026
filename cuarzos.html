@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guía de cuarzos · Sahumo ArapySandú</title>
+<meta name="description" content="Buscá tu cuarzo: propiedades, signo, chakra y los productos que tenemos en la tienda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --verde-900:#152318; --verde-800:#1e3626; --verde-700:#2b4d36;
+    --oro:#c9a227; --oro-claro:#e8cf7a; --crema:#f6f0e2; --crema-2:#efe6d0;
+    --tinta:#20241c; --tinta-suave:#5b5646; --terracota:#a85c32;
+    --line:rgba(32,36,28,0.12);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--crema); color:var(--tinta);
+    font-family:'Manrope',sans-serif; -webkit-font-smoothing:antialiased;
+    /* --- protección: no se puede seleccionar ni mantener apretado para copiar --- */
+    -webkit-user-select:none; -moz-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  input{ -webkit-user-select:text; user-select:text; }
+  h1,h2,h3{ font-family:'Fraunces',serif; font-weight:600; letter-spacing:-0.01em; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:radial-gradient(120% 140% at 20% 0%, #24402c 0%, var(--verde-900) 60%, #0f1a11 100%);
+    color:var(--crema); padding:44px 20px 36px; text-align:center;
+  }
+  .hero .volver{ color:var(--oro-claro); font-size:13px; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(232,207,122,.45); }
+  .hero h1{ font-size:clamp(30px,6vw,46px); margin:16px 0 6px; color:var(--oro-claro); }
+  .hero p{ margin:0 auto; max-width:560px; color:rgba(246,240,226,.82); font-size:15px; line-height:1.5; }
+
+  /* ---------- BUSCADOR Y PESTAÑAS ---------- */
+  .barra{ position:sticky; top:0; z-index:20; background:var(--crema); border-bottom:1px solid var(--line); padding:12px 16px 10px; }
+  .barra-inner{ max-width:1100px; margin:0 auto; }
+  .buscador input{
+    width:100%; padding:13px 16px; font:inherit; font-size:15px; border-radius:999px;
+    border:1.5px solid var(--line); background:#fff; color:var(--tinta);
+  }
+  .buscador input:focus{ outline:none; border-color:var(--oro); }
+  .tabs{ display:flex; gap:6px; overflow-x:auto; margin-top:10px; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tabs button{
+    flex:none; font:inherit; font-size:13px; font-weight:700; padding:8px 14px; border-radius:999px;
+    border:1.5px solid var(--line); background:#fff; color:var(--tinta); cursor:pointer;
+  }
+  .tabs button.activo{ background:var(--verde-800); color:var(--oro-claro); border-color:var(--verde-800); }
+  .filtros{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .filtros button{
+    font:inherit; font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; cursor:pointer;
+    border:1px solid rgba(201,162,39,.55); background:transparent; color:var(--tinta-suave);
+  }
+  .filtros button.activo{ background:var(--oro); color:var(--verde-900); border-color:var(--oro); }
+
+  main{ max-width:1100px; margin:0 auto; padding:22px 16px 60px; }
+  .vacio{ text-align:center; color:var(--tinta-suave); padding:40px 0; }
+
+  /* ---------- FOTO PROTEGIDA (fondo + marca de agua, sin <img>) ---------- */
+  .foto{
+    position:relative; background-size:cover; background-position:center; background-color:var(--crema-2);
+    pointer-events:none;
+  }
+  .foto::after{
+    content:"Sahumo ArapySandú"; position:absolute; right:8px; bottom:6px;
+    font-family:'Fraunces',serif; font-size:11px; font-weight:600; color:rgba(255,255,255,.75);
+    text-shadow:0 1px 3px rgba(0,0,0,.55); letter-spacing:.02em;
+  }
+
+  /* ---------- TARJETAS DE PIEDRAS ---------- */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:14px; }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; cursor:pointer;
+    transition:transform .15s, box-shadow .15s; text-align:left; font:inherit; color:inherit; padding:0;
+  }
+  .card:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(21,35,24,.12); }
+  .card:focus-visible{ outline:2px solid var(--oro); outline-offset:2px; }
+  .card .foto{ aspect-ratio:1/1; }
+  .card .info{ padding:10px 12px 12px; }
+  .card h3{ font-size:17px; margin:0 0 2px; }
+  .card .color{ font-size:12px; color:var(--tinta-suave); }
+  .card .en-tienda{ margin-top:6px; font-size:11.5px; font-weight:700; color:var(--verde-700); }
+  .tags{ display:flex; flex-wrap:wrap; gap:4px; margin-top:7px; }
+  .tag{ font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:999px; background:var(--crema-2); color:var(--tinta-suave); }
+
+  /* ---------- SIGNOS / CHAKRAS / KITS ---------- */
+  .lista{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; }
+  .bloque{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px 18px; }
+  .bloque h3{ margin:0; font-size:20px; display:flex; align-items:center; gap:8px; }
+  .bloque .sub{ font-size:12.5px; color:var(--tinta-suave); margin:2px 0 10px; }
+  .bloque.destacado{ border:2px solid var(--oro); }
+  .bloque .badge{ font-family:'Manrope'; font-size:10.5px; font-weight:800; background:var(--oro); color:var(--verde-900); padding:3px 8px; border-radius:999px; }
+  .punto{ width:14px; height:14px; border-radius:50%; display:inline-block; border:1px solid rgba(0,0,0,.15); }
+  .chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    font:inherit; font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:999px;
+    border:1px solid var(--line); background:var(--crema); color:var(--tinta); text-decoration:none;
+  }
+  button.chip{ cursor:pointer; border-color:var(--oro); background:#fff8e2; }
+  a.chip{ border-style:dashed; }
+  .nota{ font-size:12px; color:var(--tinta-suave); margin:14px 0 0; }
+  .nota a{ color:var(--verde-700); font-weight:700; }
+
+  /* ---------- PRODUCTOS RELACIONADOS ---------- */
+  .prods{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:10px; }
+  .prod{ background:var(--crema); border-radius:12px; overflow:hidden; display:flex; flex-direction:column; }
+  .prod .foto{ aspect-ratio:1/1; }
+  .prod .pinfo{ padding:8px 10px 10px; display:flex; flex-direction:column; gap:3px; flex:1; }
+  .prod b{ font-size:13px; line-height:1.25; text-transform:capitalize; }
+  .prod .var{ font-size:11.5px; color:var(--tinta-suave); }
+  .prod .precio{ font-weight:800; color:var(--verde-700); font-size:14px; margin-top:auto; }
+  .prod a{
+    margin-top:6px; text-align:center; font-size:12px; font-weight:800; text-decoration:none;
+    background:var(--verde-800); color:var(--oro-claro); padding:7px 8px; border-radius:999px;
+  }
+
+  /* ---------- FICHA (modal) ---------- */
+  .fondo{ position:fixed; inset:0; background:rgba(15,26,17,.6); z-index:50; display:none; align-items:flex-start; justify-content:center; overflow-y:auto; padding:24px 12px; }
+  .fondo.abierto{ display:flex; }
+  .ficha{ background:var(--crema); border-radius:20px; max-width:760px; width:100%; overflow:hidden; position:relative; }
+  .ficha .cerrar{ position:absolute; top:10px; right:10px; z-index:2; width:36px; height:36px; border-radius:50%; border:none; background:rgba(255,255,255,.92); font-size:16px; cursor:pointer; }
+  .ficha-top{ display:grid; grid-template-columns:240px 1fr; }
+  .ficha-top .foto{ min-height:240px; }
+  .ficha-top .txt{ padding:22px 22px 16px; }
+  .ficha h2{ margin:0; font-size:28px; }
+  .ficha .alias{ font-size:13px; color:var(--tinta-suave); margin-top:2px; }
+  .ficha section{ padding:0 22px 18px; }
+  .ficha h4{ font-family:'Fraunces',serif; font-size:16px; margin:14px 0 6px; color:var(--verde-700); }
+  .ficha p{ margin:0 0 8px; line-height:1.55; font-size:14.5px; }
+  .datos{ display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:13.5px; margin-top:10px; }
+  .datos dt{ font-weight:800; color:var(--tinta-suave); }
+  .datos dd{ margin:0; }
+  .que-es{ margin:10px 0 0 !important; font-size:14px !important; color:var(--tinta-suave); font-style:italic; }
+  .lista-f{ margin:0 0 6px; padding:0; list-style:none; }
+  .lista-f li{ position:relative; padding:3px 0 3px 22px; font-size:14.5px; line-height:1.45; }
+  .lista-f li::before{ content:"✦"; position:absolute; left:2px; color:var(--oro); }
+  .lista-f.usos li::before{ content:"➜"; color:var(--verde-700); }
+  .cuidado{ background:#fff3e6; border-left:4px solid var(--terracota); padding:10px 12px; border-radius:8px; font-size:13.5px; }
+  .ver-todo{ display:inline-block; margin-top:10px; font-size:13px; font-weight:800; color:var(--verde-700); }
+  @media (max-width:600px){
+    .ficha-top{ grid-template-columns:1fr; }
+    .ficha-top .foto{ min-height:0; aspect-ratio:4/3; }
+  }
+
+  /* ---------- LIMPIEZA ---------- */
+  .pasos{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .pasos .bloque p{ font-size:14px; line-height:1.55; margin:6px 0 0; }
+  .aviso{ margin-top:24px; font-size:12.5px; color:var(--tinta-suave); line-height:1.5; border-top:1px solid var(--line); padding-top:14px; }
+
+  footer{ text-align:center; font-size:12px; color:var(--tinta-suave); padding:20px 16px 40px; }
+
+  /* --- protección al imprimir: no se imprime el contenido --- */
+  @media print{
+    body *{ display:none !important; }
+    body::after{ content:"Contenido de Sahumo ArapySandú — visitá www.sahumoarapysandu.com"; display:block; padding:40px; font-size:18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a class="volver" id="linkTienda" href="index.html">← Volver a la tienda</a>
+  <h1>Guía de cuarzos</h1>
+  <p>Buscá tu piedra y conocé sus propiedades, su signo, su chakra y lo que tenemos en la tienda para vos.</p>
+</div>
+
+<div class="barra">
+  <div class="barra-inner">
+    <div class="buscador"><input type="search" id="q" placeholder="Buscá un cuarzo, lo que te pasa, tu signo o tu profesión… (ej: amatista, estrés, leo, vendedor)" autocomplete="off"></div>
+    <div class="tabs" id="tabs">
+      <button data-vista="piedras" class="activo">💎 Piedras</button>
+      <button data-vista="situaciones">🙋 ¿Qué te pasa?</button>
+      <button data-vista="profesiones">💼 Por profesión</button>
+      <button data-vista="signos">✨ Por signo</button>
+      <button data-vista="chakras">🌈 Por chakra</button>
+      <button data-vista="kits">🎁 Kits</button>
+      <button data-vista="limpieza">🌿 Cómo limpiarlas</button>
+    </div>
+    <div class="filtros" id="filtros"></div>
+  </div>
+</div>
+
+<main id="main"></main>
+
+<div class="fondo" id="fondo"><div class="ficha" id="ficha"></div></div>
+
+<footer>© Sahumo ArapySandú · Corrientes · Contenido protegido</footer>
+
+<script src="productos.js"></script>
+<script src="cuarzos-datos.js"></script>
+<script>
+// ---------------------------------------------------------------------
+// Dirección de la tienda (para los botones "Ver en la tienda")
+// ---------------------------------------------------------------------
+const TIENDA_URL = 'index.html';
+
+// ---------------------------------------------------------------------
+// PROTECCIÓN BÁSICA CONTRA COPIAR / DESCARGAR
+// (desalienta copiar, pero nadie puede impedir una captura de pantalla)
+// ---------------------------------------------------------------------
+['contextmenu','dragstart','selectstart','copy','cut'].forEach(ev=>{
+  document.addEventListener(ev, e=>{
+    if(e.target.closest && e.target.closest('input')) return; // el buscador sí se puede usar
+    e.preventDefault();
+  });
+});
+document.addEventListener('keydown', e=>{
+  const k = (e.key||'').toLowerCase();
+  if((e.ctrlKey || e.metaKey) && ['c','x','s','p','u','a'].includes(k) && !(e.target.closest && e.target.closest('input'))){
+    e.preventDefault();
+  }
+});
+
+// ---------------------------------------------------------------------
+// UTILIDADES
+// ---------------------------------------------------------------------
+const norm = s => (s||'').toString().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+const esc = s => (s||'').toString().replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const precio = n => n ? '$' + Number(n).toLocaleString('es-AR') : '';
+const linkTienda = t => TIENDA_URL + '?buscar=' + encodeURIComponent(t);
+const PROD = (typeof PRODUCTOS !== 'undefined' ? PRODUCTOS : []);
+const PIEDRAS = GUIA.piedras;
+const INTENCIONES = ['Amor','Protección','Abundancia','Calma','Energía','Espiritualidad','Claridad','Comunicación','Autoestima','Creatividad'];
+const COLOR_CHAKRA = {'Raíz':'#c0392b','Sacro':'#e67e22','Plexo solar':'#f1c40f','Corazón':'#27ae60','Garganta':'#2e86de','Tercer ojo':'#4b3f9e','Corona':'#b98ad9'};
+
+// Busca productos de la tienda que contengan alguno de los términos
+// (en el nombre o en sus variantes). Nunca muestra el stock.
+// soloPiedras: no mezcla aromas de sahumerios (ej: "ámbar") con piedras
+const CAT_AROMAS = ['sahumerios','defumacion','difusores & esencias','velas & velones'];
+function productosPara(terminos, soloPiedras){
+  // palabra completa (acepta plural): "turmalina" no confunde con "turmalinado"
+  const rs = terminos.map(norm).filter(Boolean)
+    .map(t=> new RegExp('(^|[^a-z0-9])' + t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '(s|es)?($|[^a-z0-9])'));
+  const tiene = txt => rs.some(r=> r.test(norm(txt)));
+  const res = [];
+  PROD.forEach(p=>{
+    if(soloPiedras && (CAT_AROMAS.includes(norm(p.categoria)) || norm(p.nombre).includes('sahumerio')) && !norm(p.nombre).includes('crystal')) return;
+    const vars = (p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre).filter(Boolean);
+    if(tiene(p.nombre)){ res.push({p, vars:[]}); return; }
+    const hit = vars.filter(tiene);
+    if(hit.length) res.push({p, vars:hit});
+  });
+  return res;
+}
+PIEDRAS.forEach(pi=> pi._prods = productosPara(pi.buscar, true));
+
+// Relaciona un nombre suelto ("cuarzo rosa", "jade") con su ficha, si existe
+function fichaDe(nombre){
+  const n = norm(nombre);
+  return PIEDRAS.find(pi=> norm(pi.nombre)===n || pi.alias.some(a=>norm(a)===n) || pi.buscar.some(b=>norm(b)===n)) || null;
+}
+function signosDe(pi){ return GUIA.signos.filter(s=> s.piedras.some(x=> fichaDe(x)===pi)); }
+function chakrasDe(pi){
+  const extra = GUIA.chakras.filter(c=> c.piedras.some(x=> fichaDe(x)===pi)).map(c=>c.nombre);
+  return GUIA.chakras.map(c=>c.nombre).filter(n=> pi.chakras.includes(n) || extra.includes(n));
+}
+function profesionesDe(pi){ return GUIA.profesiones.filter(s=> s.piedras.some(x=> fichaDe(x)===pi)); }
+function situacionesDe(pi){ return GUIA.situaciones.filter(s=> s.piedras.some(x=> fichaDe(x)===pi)); }
+// "aventurina verde" en la tienda está como "venturina verde", etc.
+const terminosDe = nombre => (GUIA.sinonimos||{})[norm(nombre)] || (GUIA.sinonimos||{})[nombre] || [nombre];
+function kitsDe(pi){ return GUIA.kits.filter(k=> k.piedras.some(x=> fichaDe(x)===pi)); }
+
+function chipPiedra(nombre){
+  const f = fichaDe(nombre);
+  if(f) return `<button class="chip" data-ficha="${f.id}">${esc(nombre)}</button>`;
+  const ts = terminosDe(nombre);
+  const t = ts.find(x=> productosPara([x], true).length);
+  if(t) return `<a class="chip" href="${linkTienda(t)}" title="Ver en la tienda">${esc(nombre)} ↗</a>`;
+  return `<span class="chip">${esc(nombre)}</span>`;
+}
+function htmlProductos(lista){
+  if(!lista.length) return '<p class="nota">Por ahora no tenemos productos con esta piedra. ¡Consultanos por WhatsApp!</p>';
+  return '<div class="prods">' + lista.map(({p,vars})=>`
+    <div class="prod">
+      <div class="foto" style="background-image:url('${p.imagen}')"></div>
+      <div class="pinfo">
+        <b>${esc(p.nombre)}</b>
+        ${vars.length ? `<span class="var">Disponible en: ${esc(vars.join(', '))}</span>` : ''}
+        <span class="precio">${precio(p.precio)}</span>
+        <a href="${linkTienda(p.nombre)}">Ver en la tienda</a>
+      </div>
+    </div>`).join('') + '</div>';
+}
+
+// ---------------------------------------------------------------------
+// VISTAS
+// ---------------------------------------------------------------------
+const main = document.getElementById('main');
+const q = document.getElementById('q');
+const filtrosEl = document.getElementById('filtros');
+let vista = 'piedras';
+let intencion = null;
+
+filtrosEl.innerHTML = INTENCIONES.map(i=>`<button data-int="${i}">${i}</button>`).join('');
+filtrosEl.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  intencion = (intencion === b.dataset.int) ? null : b.dataset.int;
+  [...filtrosEl.children].forEach(x=> x.classList.toggle('activo', x.dataset.int===intencion));
+  cambiarVista('piedras');
+});
+
+function signoActual(){
+  const hoy = new Date(); const md = (hoy.getMonth()+1)*100 + hoy.getDate();
+  const rangos = [['Capricornio',1222,1231],['Capricornio',101,119],['Acuario',121,219],['Piscis',220,320],['Aries',321,420],
+    ['Tauro',421,520],['Géminis',521,620],['Cáncer',621,722],['Leo',723,822],['Virgo',823,922],['Libra',923,1022],
+    ['Escorpio',1024,1122],['Sagitario',1122,1221]];
+  const r = rangos.find(([,a,b])=> md>=a && md<=b); return r ? r[0] : null;
+}
+
+function render(){
+  const t = norm(q.value);
+  filtrosEl.style.display = vista==='piedras' ? '' : 'none';
+
+  if(vista==='piedras'){
+    let lista = PIEDRAS;
+    if(intencion) lista = lista.filter(pi=> pi.intenciones.includes(intencion));
+    if(t) lista = lista.filter(pi=> norm([pi.nombre, ...pi.alias, pi.color, ...pi.intenciones, ...chakrasDe(pi),
+                     ...signosDe(pi).map(s=>s.signo), ...profesionesDe(pi).map(s=>s.nombre),
+                     ...situacionesDe(pi).map(s=>s.nombre), ...pi.texto].join(' | ')).includes(t));
+    main.innerHTML = lista.length ? '<div class="grid">' + lista.map(pi=>`
+      <button class="card" data-ficha="${pi.id}">
+        <div class="foto" style="background-image:url('${pi.foto}')"></div>
+        <div class="info">
+          <h3>${esc(pi.nombre)}</h3>
+          <div class="color">${esc(pi.color)}</div>
+          <div class="tags">${pi.intenciones.slice(0,3).map(i=>`<span class="tag">${i}</span>`).join('')}</div>
+          ${pi._prods.length ? `<div class="en-tienda">🛍 ${pi._prods.length} producto${pi._prods.length>1?'s':''} en la tienda</div>` : ''}
+        </div>
+      </button>`).join('') + '</div>'
+      : `<p class="vacio">No encontramos “${esc(q.value)}”. Probá con otro nombre o escribinos por WhatsApp.</p>`;
+  }
+
+  if(vista==='signos'){
+    const actual = signoActual();
+    const productosSigno = s => productosPara([s.signo, s.signo==='Géminis' ? 'gemenis' : '']);
+    let lista = GUIA.signos;
+    if(t) lista = lista.filter(s=> norm(s.signo + ' ' + s.piedras.join(' ')).includes(t));
+    main.innerHTML = '<div class="lista">' + lista.map(s=>{
+      const ps = productosSigno(s);
+      return `<div class="bloque ${s.signo===actual?'destacado':''}">
+        <h3>${s.signo} ${s.signo===actual?'<span class="badge">Temporada actual</span>':''}</h3>
+        <div class="sub">${s.fechas}</div>
+        <div class="chips">${s.piedras.map(chipPiedra).join('')}</div>
+        ${ps.length ? `<p class="nota">🛍 ${ps.map(({p})=>`<a href="${linkTienda(p.nombre)}">${esc(p.nombre)}</a>`).join(' · ')} — también para ${s.signo}</p>` : ''}
+      </div>`;}).join('') + '</div>' + leyendaChips();
+  }
+
+  if(vista==='situaciones' || vista==='profesiones'){
+    const datos = vista==='situaciones' ? GUIA.situaciones : GUIA.profesiones;
+    let lista = datos;
+    if(t) lista = lista.filter(s=> norm(s.nombre + ' ' + s.piedras.join(' ')).includes(t));
+    main.innerHTML = (vista==='situaciones'
+        ? '<h2 style="margin-top:0">Decinos qué te está pasando y te decimos qué piedra te acompaña</h2>'
+        : '<h2 style="margin-top:0">Cristales y profesiones</h2>') +
+      (lista.length ? '<div class="lista">' + lista.map(s=>`
+      <div class="bloque">
+        <h3>${s.icono} ${esc(s.nombre)}</h3>
+        <div class="chips" style="margin-top:10px">${s.piedras.map(chipPiedra).join('')}</div>
+      </div>`).join('') + '</div>' + leyendaChips()
+      : `<p class="vacio">No encontramos “${esc(q.value)}”.</p>`);
+  }
+
+  if(vista==='chakras'){
+    const ps = productosPara(['chakra','chackas']);
+    main.innerHTML = '<div class="lista">' + GUIA.chakras.map((c,i)=>`
+      <div class="bloque">
+        <h3><span class="punto" style="background:${COLOR_CHAKRA[c.nombre]}"></span>${i+1}. ${c.nombre}</h3>
+        <div class="sub">${c.sanscrito} · Color ${c.color.toLowerCase()}</div>
+        <div class="chips">${c.piedras.map(chipPiedra).join('')}</div>
+      </div>`).join('') + '</div>' + leyendaChips() +
+      (ps.length ? '<h3 style="margin-top:28px">Para trabajar los 7 chakras</h3>' + htmlProductos(ps) : '');
+  }
+
+  if(vista==='kits'){
+    const ps = productosPara(['kit']);
+    main.innerHTML = '<div class="lista">' + GUIA.kits.map(k=>`
+      <div class="bloque">
+        <h3>🎁 ${k.nombre}</h3>
+        <div class="chips" style="margin-top:10px">${k.piedras.map(chipPiedra).join('')}</div>
+      </div>`).join('') + '</div>' + leyendaChips() +
+      (ps.length ? '<h3 style="margin-top:28px">Kits en la tienda</h3>' + htmlProductos(ps) : '');
+  }
+
+  if(vista==='limpieza'){
+    main.innerHTML = `
+      <h2 style="margin-top:0">Cómo limpiar y cargar tus piedras</h2>
+      <p style="color:var(--tinta-suave);margin-top:-6px">Las piedras absorben la energía del ambiente y de quien las usa. Te recomendamos limpiarlas cuando llegan a tu casa y cada tanto.</p>
+      <div class="pasos">
+        <div class="bloque"><h3>🌿 Con sahumo</h3><p>Pasá la piedra por el humo de un sahumerio, hierbas o palo santo con una intención clara. Sirve para <b>todas</b> las piedras, incluso las que no se pueden mojar.</p>
+          <p><a class="ver-todo" href="${linkTienda('sahumerio')}">Ver sahumerios →</a></p></div>
+        <div class="bloque"><h3>🌕 Luz de luna</h3><p>Dejala una noche bajo la luz de la luna (mejor en luna llena) para limpiarla y cargarla suavemente.</p></div>
+        <div class="bloque"><h3>🤍 Sobre selenita</h3><p>Apoyá tus piedras sobre una barra o placa de selenita durante unas horas: las limpia sin agua.</p>
+          <p><a class="ver-todo" href="${linkTienda('selenita')}">Ver selenita →</a></p></div>
+        <div class="bloque"><h3>💧 Agua</h3><p>Algunas piedras se pueden enjuagar con agua. <b>No mojes</b> selenita, rosa del desierto, pirita ni hematite, y evitá el agua con sal en turquesa, lapislázuli y coral.</p></div>
+      </div>
+      <p class="aviso">Las propiedades que describimos provienen de la tradición de la litoterapia y del uso energético de los cristales. Son un acompañamiento para tu bienestar energético y espiritual, y no reemplazan la consulta ni el tratamiento médico.</p>`;
+  }
+}
+function leyendaChips(){
+  return '<p class="nota"><span class="chip" style="border-color:var(--oro);background:#fff8e2">Así</span> = tocá para ver la ficha · <span class="chip" style="border-style:dashed">Así ↗</span> = la tenemos en la tienda</p>';
+}
+
+function cambiarVista(v){
+  vista = v;
+  [...document.querySelectorAll('#tabs button')].forEach(b=> b.classList.toggle('activo', b.dataset.vista===v));
+  render();
+}
+document.getElementById('tabs').addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(b) cambiarVista(b.dataset.vista);
+});
+q.addEventListener('input', ()=>{
+  if(!['piedras','signos','situaciones','profesiones'].includes(vista)) cambiarVista('piedras'); else render();
+});
+
+// ---------------------------------------------------------------------
+// FICHA DE CADA PIEDRA
+// ---------------------------------------------------------------------
+const fondo = document.getElementById('fondo');
+const ficha = document.getElementById('ficha');
+function abrirFicha(id){
+  const pi = PIEDRAS.find(x=>x.id===id); if(!pi) return;
+  const signos = signosDe(pi), kits = kitsDe(pi);
+  ficha.innerHTML = `
+    <button class="cerrar" id="cerrar" aria-label="Cerrar">✕</button>
+    <div class="ficha-top">
+      <div class="foto" style="background-image:url('${pi.foto}')"></div>
+      <div class="txt">
+        <h2>${esc(pi.nombre)}</h2>
+        ${pi.alias.length ? `<div class="alias">También llamada: ${esc(pi.alias.join(', '))}</div>` : ''}
+        ${pi.que_es ? `<p class="que-es">${esc(pi.que_es)}</p>` : ''}
+        <div class="tags">${pi.intenciones.map(i=>`<span class="tag">${i}</span>`).join('')}</div>
+        <dl class="datos">
+          <dt>Color</dt><dd>${esc(pi.color)}</dd>
+          ${pi.origen ? `<dt>Origen</dt><dd>${esc(pi.origen)}</dd>` : ''}
+          ${chakrasDe(pi).length ? `<dt>Chakra</dt><dd>${chakrasDe(pi).join(', ')}</dd>` : ''}
+          ${signos.length ? `<dt>Signos</dt><dd>${signos.map(s=>s.signo).join(', ')}</dd>` : ''}
+          ${kits.length ? `<dt>Kits</dt><dd>${kits.map(k=>k.nombre).join(', ')}</dd>` : ''}
+          ${situacionesDe(pi).length ? `<dt>Ayuda con</dt><dd>${situacionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
+          ${profesionesDe(pi).length ? `<dt>Profesión</dt><dd>${profesionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
+        </dl>
+      </div>
+    </div>
+    <section>
+      ${pi.beneficios ? `<h4>Beneficios</h4><ul class="lista-f">${pi.beneficios.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+      ${pi.usos ? `<h4>Cómo usarla</h4><ul class="lista-f usos">${pi.usos.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
+      <h4>Propiedades</h4>
+      ${pi.texto.map(p=>`<p>${esc(p)}</p>`).join('')}
+      ${pi.cuidado ? `<h4>Cuidados</h4><div class="cuidado">⚠️ ${esc(pi.cuidado)}</div>` : ''}
+      <h4>En nuestra tienda</h4>
+      ${htmlProductos(pi._prods)}
+      ${pi._prods.length ? `<a class="ver-todo" href="${linkTienda(pi.buscar[0])}">Ver todo lo que tenemos en ${esc(pi.nombre.toLowerCase())} →</a>` : ''}
+    </section>`;
+  fondo.classList.add('abierto');
+  document.body.style.overflow = 'hidden';
+  history.replaceState(null, '', '#' + pi.id);
+  document.getElementById('cerrar').onclick = cerrarFicha;
+}
+function cerrarFicha(){
+  fondo.classList.remove('abierto');
+  document.body.style.overflow = '';
+  history.replaceState(null, '', location.pathname + location.search);
+}
+fondo.addEventListener('click', e=>{ if(e.target===fondo) cerrarFicha(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarFicha(); });
+document.addEventListener('click', e=>{
+  const b = e.target.closest('[data-ficha]'); if(b) abrirFicha(b.dataset.ficha);
+});
+
+document.getElementById('linkTienda').href = TIENDA_URL;
+render();
+// Si alguien entra con un link directo (ej: cuarzos.html#amatista) se abre esa ficha
+if(location.hash) abrirFicha(location.hash.slice(1));
+</script>
+</body>
+</html>

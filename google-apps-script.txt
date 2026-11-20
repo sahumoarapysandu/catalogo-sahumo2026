@@ -13,6 +13,9 @@ La hoja de STOCK debe tener 7 columnas: id | nombre | categoria | marca | aroma 
 La hoja de PEDIDOS se crea SOLA la primera vez que llega un pedido
 del catálogo online, con estas columnas: fecha | nombre | telefono | pedido | total
 
+La hoja CONTADOR se crea SOLA con la primera visita al catálogo:
+en la celda B2 está el total de visitas (podés cambiar ese número).
+
 La hoja de VENTASFERIA se crea SOLA la primera vez que un vendedor
 carga una venta desde panel-ventas.html, con estas columnas:
 lugar | categoria | producto | cantidad | precio | hora | dia
@@ -23,8 +26,39 @@ lugar | categoria | producto | cantidad | precio | hora | dia
 // Sacado de: https://docs.google.com/spreadsheets/d/1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow/edit
 var SPREADSHEET_ID = "1-DhFJP2rol-babmzhORAjQan_jIs08XM8B9XRX3uvow";
 
+// CONTADOR DE VISITAS: se guarda en la hoja "Contador" (celda B2).
+// La hoja se crea sola con la primera visita. Para que el contador
+// arranque desde el número real de Google Analytics, escribí ese
+// número en la celda B2 de la hoja "Contador".
+function contarVisita(sumar) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var hoja = ss.getSheetByName("Contador");
+    if (!hoja) {
+      hoja = ss.insertSheet("Contador");
+      hoja.getRange("A1:B1").setValues([["dato", "valor"]]);
+      hoja.getRange("A2:B2").setValues([["visitas", 0]]);
+    }
+    var n = Number(hoja.getRange("B2").getValue()) || 0;
+    if (sumar) { n = n + 1; hoja.getRange("B2").setValue(n); }
+    return n;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function doGet(e) {
-  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getActiveSheet();
+  var accion = (e && e.parameter && e.parameter.accion) || "";
+  if (accion === "visita" || accion === "vervisitas") {
+    var total = contarVisita(accion === "visita");
+    return ContentService
+      .createTextOutput(JSON.stringify({ visitas: total }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  var sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheets()[0];
   var data = sheet.getDataRange().getValues();
   var rows = [];
   for (var i = 1; i < data.length; i++) {
@@ -46,7 +80,7 @@ function doGet(e) {
 
 function doPost(e) {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  var sheet = ss.getActiveSheet();
+  var sheet = ss.getSheets()[0];
   var p = e.parameter;
   var action = p.action;
 
