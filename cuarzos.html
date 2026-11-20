@@ -469,8 +469,7 @@ function abrirFicha(id){
     <section>
       ${pi.beneficios ? `<h4>Beneficios</h4><ul class="lista-f">${pi.beneficios.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
       ${pi.usos ? `<h4>Cómo usarla</h4><ul class="lista-f usos">${pi.usos.map(b=>`<li>${esc(b)}</li>`).join('')}</ul>` : ''}
-      <h4>Propiedades</h4>
-      ${pi.texto.map(p=>`<p>${esc(p)}</p>`).join('')}
+      ${pi.texto.length ? `<h4>Propiedades</h4>${pi.texto.map(p=>`<p>${esc(p)}</p>`).join('')}` : ''}
       ${pi.cuidado ? `<h4>Cuidados</h4><div class="cuidado">⚠️ ${esc(pi.cuidado)}</div>` : ''}
       <h4>En nuestra tienda</h4>
       ${htmlProductos(pi._prods)}
