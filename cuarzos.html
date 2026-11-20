@@ -50,12 +50,14 @@
     border:1.5px solid var(--line); background:#fff; color:var(--tinta); cursor:pointer;
   }
   .tabs button.activo{ background:var(--verde-800); color:var(--oro-claro); border-color:var(--verde-800); }
-  .filtros{ display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+  .filtros{ display:flex; gap:5px; flex-wrap:wrap; margin-top:10px; }
   .filtros button{
-    font:inherit; font-size:12px; font-weight:600; padding:5px 11px; border-radius:999px; cursor:pointer;
+    font:inherit; font-size:12px; font-weight:600; padding:5px 9px; border-radius:999px; cursor:pointer;
     border:1px solid rgba(201,162,39,.55); background:transparent; color:var(--tinta-suave);
   }
   .filtros button.activo{ background:var(--oro); color:var(--verde-900); border-color:var(--oro); }
+  .filtros button i{ font-style:normal; margin-right:4px; }
+  .filtros-tit{ display:none; }
 
   .tabs button i{ font-style:normal; margin-right:5px; }
   .tabs button .c{ display:none; }
@@ -80,11 +82,13 @@
     .tabs button i{ margin:0; font-size:18px; }
     .tabs button .l{ display:none; }
     .tabs button .c{ display:block; }
-    /* filtros: una sola fila que se desliza con el dedo */
-    .filtros{ flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:2px;
-      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent); mask-image:linear-gradient(90deg,#000 85%,transparent); }
-    .filtros::-webkit-scrollbar{ display:none; }
-    .filtros button{ flex:none; padding:6px 12px; font-size:12.5px; }
+    /* filtros: grilla con todos a la vista */
+    .filtros{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; margin-top:12px; }
+    .filtros-tit{ display:block; grid-column:1/-1; font-size:11.5px; font-weight:800; color:var(--tinta-suave); letter-spacing:.02em; }
+    .filtros button{ display:flex; align-items:center; justify-content:center; gap:4px; padding:7px 4px; font-size:12px;
+      border-radius:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:#fff; }
+    .filtros button i{ margin:0; }
+    .filtros button.activo{ background:var(--oro); }
     main{ padding:16px 12px 70px; }
     .lista{ grid-template-columns:1fr; }
     .pasos{ grid-template-columns:1fr; }
@@ -280,6 +284,7 @@ const linkTienda = t => TIENDA_URL + '?buscar=' + encodeURIComponent(t);
 const PROD = (typeof PRODUCTOS !== 'undefined' ? PRODUCTOS : []);
 const PIEDRAS = GUIA.piedras;
 const INTENCIONES = ['Amor','Protección','Abundancia','Calma','Energía','Espiritualidad','Claridad','Comunicación','Autoestima','Creatividad'];
+const ICONO_INT = {'Amor':'💗','Protección':'🛡️','Abundancia':'💰','Calma':'🌙','Energía':'⚡','Espiritualidad':'🔮','Claridad':'💡','Comunicación':'💬','Autoestima':'🌟','Creatividad':'🎨'};
 const COLOR_CHAKRA = {'Raíz':'#c0392b','Sacro':'#e67e22','Plexo solar':'#f1c40f','Corazón':'#27ae60','Garganta':'#2e86de','Tercer ojo':'#4b3f9e','Corona':'#b98ad9'};
 
 // Busca productos de la tienda que contengan alguno de los términos
@@ -350,8 +355,8 @@ const filtrosEl = document.getElementById('filtros');
 let vista = 'piedras';
 let intencion = null;
 
-filtrosEl.innerHTML = '<button data-int="" class="activo">Todas</button>' + INTENCIONES.map(i=>`<button data-int="${i}">${i}</button>`).join('');
-function marcarIntencion(){ [...filtrosEl.children].forEach(x=> x.classList.toggle('activo', (x.dataset.int||null)===intencion)); }
+filtrosEl.innerHTML = '<span class="filtros-tit">Filtrar por intención</span><button data-int="" class="activo"><i>✦</i>Todas</button>' + INTENCIONES.map(i=>`<button data-int="${i}"><i>${ICONO_INT[i]}</i>${i}</button>`).join('');
+function marcarIntencion(){ [...filtrosEl.querySelectorAll('button')].forEach(x=> x.classList.toggle('activo', (x.dataset.int||null)===intencion)); }
 filtrosEl.addEventListener('click', e=>{
   const b = e.target.closest('button'); if(!b) return;
   const v = b.dataset.int || null;
