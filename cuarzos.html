@@ -57,6 +57,43 @@
   }
   .filtros button.activo{ background:var(--oro); color:var(--verde-900); border-color:var(--oro); }
 
+  .tabs button i{ font-style:normal; margin-right:5px; }
+  .tabs button .c{ display:none; }
+  .subir{
+    position:fixed; right:14px; bottom:18px; z-index:30; display:none;
+    font:inherit; font-size:13px; font-weight:800; padding:11px 16px; border-radius:999px; border:none;
+    background:var(--verde-800); color:var(--oro-claro); box-shadow:0 6px 18px rgba(0,0,0,.25); cursor:pointer;
+  }
+  .subir.ver{ display:block; }
+
+  /* ---------- CELULAR ---------- */
+  @media (max-width:640px){
+    .hero{ padding:28px 16px 24px; }
+    .hero h1{ margin:10px 0 4px; }
+    .hero p{ font-size:14px; }
+    /* el menú deja de quedar fijo para no tapar la pantalla; aparece el botón "Menú" */
+    .barra{ position:static; padding:12px 12px 10px; }
+    .buscador input{ padding:12px 14px; font-size:16px; }
+    /* pestañas: grilla de 4 columnas, ícono arriba y nombre corto abajo */
+    .tabs{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; overflow:visible; }
+    .tabs button{ display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 2px; border-radius:14px; font-size:11.5px; line-height:1.15; }
+    .tabs button i{ margin:0; font-size:18px; }
+    .tabs button .l{ display:none; }
+    .tabs button .c{ display:block; }
+    /* filtros: una sola fila que se desliza con el dedo */
+    .filtros{ flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:2px;
+      -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent); mask-image:linear-gradient(90deg,#000 85%,transparent); }
+    .filtros::-webkit-scrollbar{ display:none; }
+    .filtros button{ flex:none; padding:6px 12px; font-size:12.5px; }
+    main{ padding:16px 12px 70px; }
+    .lista{ grid-template-columns:1fr; }
+    .pasos{ grid-template-columns:1fr; }
+    .ficha section, .ficha-top .txt{ padding-left:16px; padding-right:16px; }
+    .ficha h2{ font-size:24px; }
+    .prods{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .fondo{ padding:10px 6px; }
+  }
+
   main{ max-width:1100px; margin:0 auto; padding:22px 16px 60px; }
   .vacio{ text-align:center; color:var(--tinta-suave); padding:40px 0; }
 
@@ -189,19 +226,20 @@
   <div class="barra-inner">
     <div class="buscador"><input type="search" id="q" placeholder="Buscá un cuarzo, lo que te pasa, tu signo o tu profesión… (ej: amatista, estrés, leo, vendedor)" autocomplete="off"></div>
     <div class="tabs" id="tabs">
-      <button data-vista="piedras" class="activo">💎 Piedras</button>
-      <button data-vista="situaciones">🙋 ¿Qué te pasa?</button>
-      <button data-vista="profesiones">💼 Por profesión</button>
-      <button data-vista="signos">✨ Por signo</button>
-      <button data-vista="chakras">🌈 Por chakra</button>
-      <button data-vista="kits">🎁 Kits</button>
-      <button data-vista="limpieza">🌿 Cómo limpiarlas</button>
+      <button data-vista="piedras" class="activo"><i>💎</i><span class="l">Piedras</span><span class="c">Piedras</span></button>
+      <button data-vista="situaciones"><i>🙋</i><span class="l">¿Qué te pasa?</span><span class="c">¿Qué te pasa?</span></button>
+      <button data-vista="profesiones"><i>💼</i><span class="l">Por profesión</span><span class="c">Profesión</span></button>
+      <button data-vista="signos"><i>✨</i><span class="l">Por signo</span><span class="c">Signo</span></button>
+      <button data-vista="chakras"><i>🌈</i><span class="l">Por chakra</span><span class="c">Chakra</span></button>
+      <button data-vista="kits"><i>🎁</i><span class="l">Kits</span><span class="c">Kits</span></button>
+      <button data-vista="limpieza"><i>🌿</i><span class="l">Cómo limpiarlas</span><span class="c">Limpieza</span></button>
     </div>
     <div class="filtros" id="filtros"></div>
   </div>
 </div>
 
 <main id="main"></main>
+<button class="subir" id="subir" aria-label="Volver al menú">☰ Menú</button>
 
 <div class="fondo" id="fondo"><div class="ficha" id="ficha"></div></div>
 
@@ -498,6 +536,18 @@ document.addEventListener('click', e=>{
 });
 
 document.getElementById('linkTienda').href = TIENDA_URL;
+// Botón "Menú" para volver arriba (útil en el celular)
+const btnSubir = document.getElementById('subir');
+const barra = document.querySelector('.barra');
+window.addEventListener('scroll', ()=>{
+  btnSubir.classList.toggle('ver', window.scrollY > barra.offsetTop + barra.offsetHeight + 200);
+}, {passive:true});
+btnSubir.onclick = ()=> window.scrollTo({ top: barra.offsetTop - 8, behavior:'smooth' });
+// Al cambiar de pestaña en el celular, mostrar el contenido desde arriba
+document.getElementById('tabs').addEventListener('click', ()=>{
+  if(window.innerWidth <= 640 && window.scrollY > barra.offsetTop) window.scrollTo({ top: barra.offsetTop - 8 });
+});
+if(window.innerWidth <= 640) q.placeholder = 'Buscá piedra, signo o lo que te pasa…';
 render();
 // Si alguien entra con un link directo (ej: cuarzos.html#amatista) se abre esa ficha
 if(location.hash) abrirFicha(location.hash.slice(1));
