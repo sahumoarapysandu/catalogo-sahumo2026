@@ -197,6 +197,35 @@
   .lista-f li{ position:relative; padding:3px 0 3px 22px; font-size:14.5px; line-height:1.45; }
   .lista-f li::before{ content:"✦"; position:absolute; left:2px; color:var(--oro); }
   .lista-f.usos li::before{ content:"➜"; color:var(--verde-700); }
+  /* ---------- SOLO LA FICHA (link compartido) ---------- */
+  body.solo-ficha .hero, body.solo-ficha .barra, body.solo-ficha main,
+  body.solo-ficha footer, body.solo-ficha .subir{ display:none !important; }
+  body.solo-ficha{ background:var(--verde-900); }
+  body.solo-ficha .fondo{ position:static; background:transparent; padding:18px 10px 30px; overflow:visible; }
+  .solo-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    background:var(--verde-800); color:var(--oro-claro); padding:12px 16px; }
+  .solo-marca{ font-family:'Fraunces',serif; font-weight:700; font-size:17px; line-height:1.1; }
+  .solo-marca small{ display:block; font-family:'Manrope',sans-serif; font-weight:600; font-size:11.5px; color:rgba(246,240,226,.75); }
+  .solo-guia{ font:inherit; font-size:13px; font-weight:800; padding:8px 14px; border-radius:999px; border:none;
+    background:var(--oro); color:var(--verde-900); cursor:pointer; }
+  .acciones{ margin-top:14px; padding-top:12px; border-top:1px dashed rgba(32,36,28,.2); }
+  .acc-tit{ display:block; font-size:13px; font-weight:800; color:var(--verde-700); margin-bottom:8px; }
+  .acc-btns{ display:flex; flex-wrap:wrap; gap:8px; }
+  .panel-compartir{ margin-top:10px; }
+  .panel-compartir[hidden]{ display:none; }
+  .link-fila{ display:flex; gap:6px; }
+  .link-fila input{ flex:1; min-width:0; font:inherit; font-size:13px; padding:8px 10px; border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--tinta); }
+  .btn-copiar{ font:inherit; font-size:13px; font-weight:800; padding:8px 14px; border-radius:10px; border:none; background:var(--oro); color:var(--verde-900); cursor:pointer; }
+  .btn-wa, .btn-compartir{
+    display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:13px; font-weight:800;
+    padding:9px 14px; border-radius:999px; text-decoration:none; cursor:pointer; border:none;
+  }
+  .btn-wa{ background:#25d366; color:#0b3d1f; }
+  .btn-wa::before{ content:""; width:16px; height:16px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230b3d1f'%3E%3Cpath d='M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z'/%3E%3C/svg%3E") center/contain no-repeat; }
+  .btn-wa:hover{ filter:brightness(1.05); }
+  .btn-compartir{ background:var(--verde-800); color:var(--oro-claro); }
+  .acc-aviso{ display:block; margin-top:6px; font-size:12px; color:var(--verde-700); font-weight:700; }
+  .acc-aviso[hidden]{ display:none; }
   .cuidado{ background:#fff3e6; border-left:4px solid var(--terracota); padding:10px 12px; border-radius:8px; font-size:13.5px; }
   .ver-todo{ display:inline-block; margin-top:10px; font-size:13px; font-weight:800; color:var(--verde-700); }
   @media (max-width:600px){
@@ -256,6 +285,8 @@
 // Dirección de la tienda (para los botones "Ver en la tienda")
 // ---------------------------------------------------------------------
 const TIENDA_URL = 'index.html';
+// Dirección pública de la guía (para compartir)
+const GUIA_URL = 'https://www.sahumoarapysandu.com/cuarzos.html';
 
 // ---------------------------------------------------------------------
 // PROTECCIÓN BÁSICA CONTRA COPIAR / DESCARGAR
@@ -468,6 +499,38 @@ function resumen(pi){
   if(pi.beneficios) return pi.beneficios.slice(0,3).join(' ');
   return pi.texto.join(' ');
 }
+// Mensajes y links para WhatsApp / compartir
+// El link compartido abre SOLO la ficha (cuarzos.html#ficha-amatista)
+const linkFicha = pi => GUIA_URL + '#ficha-' + pi.id;
+// "la amatista", "el cuarzo rosa", "el ágata azul"
+function conArticulo(nombre){
+  const n = nombre.toLowerCase();
+  const primera = norm(n.split(' ')[0]);
+  const art = (primera.endsWith('a') && primera !== 'agata') ? 'la' : 'el';
+  return art + ' ' + n;
+}
+const mensajeCompartir = pi => `Mirá esta piedra: ${pi.nombre} ✨ ${pi.que_es || ''} ${linkFicha(pi)}`;
+async function compartir(pi){
+  // En el celular: se abre el menú de compartir del teléfono (WhatsApp, Instagram, mensajes...)
+  if(navigator.share){
+    try { await navigator.share({ title: pi.nombre + ' · Sahumo ArapySandú', text: mensajeCompartir(pi), url: linkFicha(pi) }); return; }
+    catch(e){ if(e && e.name === 'AbortError') return; }
+  }
+  // En la computadora: se muestra el link para copiarlo
+  const panel = document.getElementById('panelCompartir');
+  panel.hidden = false;
+  document.getElementById('btnCopiar').onclick = copiarLink;
+  copiarLink();
+}
+async function copiarLink(){
+  const input = document.getElementById('linkCompartir');
+  let ok = false;
+  try { await navigator.clipboard.writeText(input.value); ok = true; } catch(e){}
+  if(!ok){ try { input.select(); ok = document.execCommand('copy'); } catch(e){} }
+  input.select();
+  const a = document.getElementById('avisoCompartir');
+  if(ok && a){ a.hidden = false; setTimeout(()=> a.hidden = true, 4000); }
+}
 function leyendaChips(){
   return '<p class="nota"><span class="chip" style="border-color:var(--oro);background:#fff8e2">Así</span> = tocá para ver la ficha · <span class="chip" style="border-style:dashed">Así ↗</span> = la tenemos en la tienda</p>';
 }
@@ -492,11 +555,17 @@ q.addEventListener('input', ()=>{
 // ---------------------------------------------------------------------
 const fondo = document.getElementById('fondo');
 const ficha = document.getElementById('ficha');
-function abrirFicha(id){
+let modoSolo = false;
+function abrirFicha(id, solo){
   const pi = PIEDRAS.find(x=>x.id===id); if(!pi) return;
+  modoSolo = !!solo;
+  document.body.classList.toggle('solo-ficha', modoSolo);
   const signos = signosDe(pi), kits = kitsDe(pi);
   ficha.innerHTML = `
-    <button class="cerrar" id="cerrar" aria-label="Cerrar">✕</button>
+    ${modoSolo ? `<div class="solo-top">
+        <span class="solo-marca">Sahumo ArapySandú<small>Guía de cuarzos</small></span>
+        <button class="solo-guia" id="verGuia">💎 Ver toda la guía</button>
+      </div>` : `<button class="cerrar" id="cerrar" aria-label="Cerrar">✕</button>`}
     <div class="ficha-top">
       <div class="foto" style="background-image:url('${pi.foto}')"></div>
       <div class="txt">
@@ -513,6 +582,17 @@ function abrirFicha(id){
           ${situacionesDe(pi).length ? `<dt>Ayuda con</dt><dd>${situacionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
           ${profesionesDe(pi).length ? `<dt>Profesión</dt><dd>${profesionesDe(pi).map(s=>s.nombre).join(', ')}</dd>` : ''}
         </dl>
+        <div class="acciones">
+          <button class="btn-compartir" data-compartir="${pi.id}">🔗 Compartir esta piedra</button>
+          <div class="panel-compartir" id="panelCompartir" hidden>
+            <span class="acc-tit">Copiá el link y mandalo a quien quieras:</span>
+            <div class="link-fila">
+              <input type="text" readonly id="linkCompartir" value="${linkFicha(pi)}">
+              <button class="btn-copiar" id="btnCopiar">Copiar</button>
+            </div>
+            <span class="acc-aviso" id="avisoCompartir" hidden>✔ ¡Link copiado! Pegalo en WhatsApp, Instagram o donde quieras.</span>
+          </div>
+        </div>
       </div>
     </div>
     <section>
@@ -525,19 +605,29 @@ function abrirFicha(id){
       ${pi._prods.length ? `<a class="ver-todo" href="${linkTienda(pi.buscar[0])}">Ver todo lo que tenemos en ${esc(pi.nombre.toLowerCase())} →</a>` : ''}
     </section>`;
   fondo.classList.add('abierto');
-  document.body.style.overflow = 'hidden';
-  history.replaceState(null, '', '#' + pi.id);
-  document.getElementById('cerrar').onclick = cerrarFicha;
+  if(modoSolo){
+    document.body.style.overflow = '';
+    history.replaceState(null, '', '#ficha-' + pi.id);
+    document.title = pi.nombre + ' · Sahumo ArapySandú';
+    document.getElementById('verGuia').onclick = ()=>{ cerrarFicha(); window.scrollTo(0,0); };
+  } else {
+    document.body.style.overflow = 'hidden';
+    history.replaceState(null, '', '#' + pi.id);
+    document.getElementById('cerrar').onclick = cerrarFicha;
+  }
 }
 function cerrarFicha(){
+  if(modoSolo){ modoSolo = false; document.body.classList.remove('solo-ficha'); document.title = 'Guía de cuarzos · Sahumo ArapySandú'; }
   fondo.classList.remove('abierto');
   document.body.style.overflow = '';
   history.replaceState(null, '', location.pathname + location.search);
 }
-fondo.addEventListener('click', e=>{ if(e.target===fondo) cerrarFicha(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarFicha(); });
+fondo.addEventListener('click', e=>{ if(e.target===fondo && !modoSolo) cerrarFicha(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !modoSolo) cerrarFicha(); });
 document.addEventListener('click', e=>{
-  const b = e.target.closest('[data-ficha]'); if(b) abrirFicha(b.dataset.ficha);
+  const c = e.target.closest('[data-compartir]');
+  if(c){ const pi = PIEDRAS.find(x=>x.id===c.dataset.compartir); if(pi) compartir(pi); return; }
+  const b = e.target.closest('[data-ficha]'); if(b) abrirFicha(b.dataset.ficha, modoSolo);
 });
 
 document.getElementById('linkTienda').href = TIENDA_URL;
@@ -555,7 +645,8 @@ document.getElementById('tabs').addEventListener('click', ()=>{
 if(window.innerWidth <= 640) q.placeholder = 'Buscá piedra, signo o lo que te pasa…';
 render();
 // Si alguien entra con un link directo (ej: cuarzos.html#amatista) se abre esa ficha
-if(location.hash) abrirFicha(location.hash.slice(1));
+if(location.hash.startsWith('#ficha-')) abrirFicha(location.hash.slice(7), true);
+else if(location.hash) abrirFicha(location.hash.slice(1));
 </script>
 </body>
 </html>
