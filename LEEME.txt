@@ -244,3 +244,10 @@ Para activarlo (una sola vez):
 
 Si el contador no se puede conectar, simplemente no se muestra
 (el catálogo funciona igual).
+
+CARRITO GUARDADO
+------------------
+El carrito queda guardado en el celular del cliente: si pasa a la Guía de
+cuarzos y vuelve, o recarga la página, sus productos siguen ahí. En la guía
+aparece "🛒 Tu carrito (X)" para volver a la tienda. El carrito guardado se
+borra solo a los 3 días o cuando el cliente envía el pedido por WhatsApp.

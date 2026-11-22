@@ -630,6 +630,41 @@ const PRODUCTS = (PRODUCTS_FALTAN ? [] : PRODUCTOS).map((p, i) => ({
 
 const cart = {}; // key "id::aroma" -> {id, aroma, qty}
 
+// ---------- CARRITO GUARDADO EN EL CELULAR ----------
+// Así no se pierde si el cliente pasa a la Guía de cuarzos y vuelve, o si recarga la página.
+// Se borra solo a los 3 días, o cuando el pedido se envía por WhatsApp.
+const CART_KEY = 'sahumoCarrito';
+const CART_DIAS = 3;
+function guardarCarrito(){
+  try {
+    const items = Object.values(cart).filter(e=>e.qty>0).map(e=>{
+      const p = PRODUCTS.find(x=>x.id==e.id);
+      return { id: e.id, aroma: e.aroma, qty: e.qty, nombre: p ? p.name : '' };
+    });
+    if (items.length) localStorage.setItem(CART_KEY, JSON.stringify({ t: Date.now(), items }));
+    else localStorage.removeItem(CART_KEY);
+  } catch(e) {}
+}
+function cargarCarrito(){
+  try {
+    const raw = localStorage.getItem(CART_KEY); if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data || !Array.isArray(data.items) || Date.now() - data.t > CART_DIAS*24*60*60*1000) { localStorage.removeItem(CART_KEY); return; }
+    data.items.forEach(it=>{
+      // se busca el mismo producto (por id y nombre, por si cambió el orden del catálogo)
+      let p = PRODUCTS.find(x=>x.id==it.id && x.name===it.nombre) || PRODUCTS.find(x=>x.name===it.nombre);
+      if (!p || !(it.qty > 0)) return;
+      if (it.aroma) {
+        const aromas = (p.aromas||[]).map(a=> typeof a === 'string' ? a : a.nombre);
+        if (!aromas.includes(it.aroma)) return;   // esa variante ya no existe
+      }
+      const key = p.id + '::' + it.aroma;
+      cart[key] = { id: p.id, aroma: it.aroma, qty: Math.min(Math.floor(it.qty), 99) };
+    });
+  } catch(e) {}
+}
+cargarCarrito();
+
 // ---------- GOOGLE ANALYTICS: eventos del catálogo ----------
 function gaEvent(name, params){
   try { if (typeof gtag === 'function') gtag('event', name, params || {}); } catch(e) {}
@@ -912,6 +947,7 @@ catalog.addEventListener('click', e=>{
 });
 
 function renderCart(){
+  guardarCarrito();
   const keys = Object.keys(cart).filter(k=>cart[k].qty>0);
   const badge = document.getElementById('cartBadge');
   const totalQty = keys.reduce((s,k)=>s+cart[k].qty,0);
@@ -1039,6 +1075,8 @@ document.getElementById('sendBtn').onclick = ()=>{
 
   window.open(`https://wa.me/${vendedor}?text=${msg}`, '_blank');
   modalBg.classList.remove('show');
+  // pedido enviado: ya no se guarda para la próxima visita
+  try { localStorage.removeItem(CART_KEY); } catch(e) {}
 };
 
 // ambient smoke svg

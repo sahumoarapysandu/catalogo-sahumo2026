@@ -32,6 +32,8 @@
     color:var(--crema); padding:44px 20px 36px; text-align:center;
   }
   .hero .volver{ color:var(--oro-claro); font-size:13px; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(232,207,122,.45); }
+  .mi-carrito{ display:inline-block; margin-left:14px; color:var(--verde-900); background:var(--oro); font-size:13px; font-weight:800; text-decoration:none; padding:5px 12px; border-radius:999px; }
+  .mi-carrito[hidden]{ display:none; }
   .hero h1{ font-size:clamp(30px,6vw,46px); margin:16px 0 6px; color:var(--oro-claro); }
   .hero p{ margin:0 auto; max-width:560px; color:rgba(246,240,226,.82); font-size:15px; line-height:1.5; }
 
@@ -258,6 +260,7 @@
 
 <div class="hero">
   <a class="volver" id="linkTienda" href="index.html">← Volver a la tienda</a>
+  <a class="mi-carrito" id="miCarrito" href="index.html" hidden>🛒 Tu carrito (<b id="miCarritoN">0</b>)</a>
   <h1>Guía de cuarzos</h1>
   <p>Buscá tu piedra y conocé sus propiedades, su signo, su chakra y lo que tenemos en la tienda para vos.</p>
 </div>
@@ -658,6 +661,12 @@ document.addEventListener('click', e=>{
 });
 
 document.getElementById('linkTienda').href = TIENDA_URL;
+// Si el cliente ya tiene productos en el carrito de la tienda, se lo recordamos
+try {
+  const c = JSON.parse(localStorage.getItem('sahumoCarrito') || 'null');
+  const n = c && Array.isArray(c.items) && (Date.now() - c.t < 3*24*60*60*1000) ? c.items.reduce((s,i)=> s + (i.qty||0), 0) : 0;
+  if (n > 0) { document.getElementById('miCarritoN').textContent = n; const mc = document.getElementById('miCarrito'); mc.href = TIENDA_URL; mc.hidden = false; }
+} catch(e) {}
 // Botón "Menú" para volver arriba (útil en el celular)
 const btnSubir = document.getElementById('subir');
 const barra = document.querySelector('.barra');
